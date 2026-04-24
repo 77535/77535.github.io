@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=2.0, minimum-scale=0.5">
+  <title>原电池实验 · 电流表与电子流动可视化</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: linear-gradient(145deg, #1a1e2b 0%, #2a2f3f 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+      padding: 20px;
+      margin: 0;
+    }
+    .experiment-card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-radius: 3.5rem;
+      padding: 2rem 2.5rem 2.2rem;
+      box-shadow: 0 30px 50px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: fit-content;
+      max-width: 750px;
+      transition: all 0.3s ease;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 2.2rem;
+      background: radial-gradient(circle at 20% 30%, #f5f3ef, #d9d5cc);
+      box-shadow: 0 20px 35px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+      margin-bottom: 1.8rem;
+      transition: filter 0.3s;
+    }
+    .control-panel {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 1.8rem;
+      width: 100%;
+      background: rgba(10, 12, 20, 0.45);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 3rem;
+      padding: 1.2rem 2.2rem;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+    }
+    .btn-group {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .chem-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      color: #f0e6d2;
+      font-weight: 600;
+      font-size: 1.1rem;
+      padding: 0.7rem 1.8rem;
+      border-radius: 2.5rem;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      letter-spacing: 0.04em;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      background: linear-gradient(135deg, rgba(70, 80, 100, 0.5), rgba(30, 35, 50, 0.7));
+      border-color: rgba(210, 180, 140, 0.7);
+    }
+    .return-home-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #4f46e5;
+      color: white;
+      text-decoration: none;
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-weight: 700;
+      box-shadow: 0 12px 24px rgba(79, 70, 229, 0.2);
+      transition: background 0.2s, transform 0.2s;
+      margin-bottom: 18px;
+    }
+    .return-home-btn:hover {
+      background: #4338ca;
+      transform: translateY(-1px);
+    }
+    .chem-btn:hover {
+      background: linear-gradient(135deg, #b9925e, #8b6b42);
+      border-color: #f5d78c;
+      color: #fff6e8;
+      box-shadow: 0 8px 18px rgba(180, 130, 60, 0.6);
+      transform: translateY(-2px);
+    }
+    .chem-btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.5);
+    }
+    .chem-btn.active {
+      background: linear-gradient(135deg, #d4a24c, #a67c3d);
+      border-color: #ffdd99;
+      color: #0b0e14;
+      font-weight: bold;
+      box-shadow: 0 0 18px #f0b34b;
+    }
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-left: 0.5rem;
+    }
+    .led {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: #4c5b6b;
+      box-shadow: 0 0 8px rgba(0,0,0,0.6);
+      transition: all 0.2s;
+    }
+    .led.on {
+      background: #ffd966;
+      box-shadow: 0 0 18px #f9b81b, 0 0 8px #ffbb2e;
+    }
+    .current-text {
+      color: #e9dccd;
+      font-weight: 600;
+      font-size: 1rem;
+      background: rgba(0,0,0,0.4);
+      padding: 0.3rem 1.2rem;
+      border-radius: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .value {
+      color: #ffd966;
+      font-weight: 700;
+      font-size: 1.2rem;
+      margin-left: 0.2rem;
+    }
+    @media (max-width: 550px) {
+      .experiment-card {
+        padding: 1.2rem 1rem 1.5rem;
+      }
+      .control-panel {
+        gap: 1rem;
+        padding: 1rem 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<div style="display: flex; flex-direction: column; align-items: center;">
+  <a class="return-home-btn" href="index.html">← 返回主界面</a>
+  <div class="experiment-card">
+    <!-- 画布：电流表在上方，中间是原电池场景，电子流动动画 -->
+    <canvas id="batteryCanvas" width="650" height="420" aria-label="原电池实验可视化，电流表指针摆动，电子从锌电极流向铜电极"></canvas>
+    
+    <div class="control-panel">
+      <div class="btn-group">
+        <button id="connectBtn" class="chem-btn active">
+          <span>🔌</span> 连通电路
+        </button>
+        <button id="disconnectBtn" class="chem-btn">
+          <span>⏹️</span> 断开电路
+        </button>
+      </div>
+      <div class="status-indicator">
+        <span class="led" id="statusLed"></span>
+        <span class="current-text">
+          ⚡电流 <span class="value" id="currentValue">0.00</span> A
+        </span>
+      </div>
+    </div>
+    <div style="color: #b9b09b; margin-top: 0.7rem; font-size: 0.9rem; letter-spacing: 0.03rem;">
+      Zn | ZnSO₄ (aq)  ──  盐桥  ──  Cu | CuSO₄ (aq)
+    </div>
+  </div>
+  <div style="color: #7f8c8d; margin-top: 0.8rem; font-size: 0.8rem;">
+    ⚡ 电子流动方向：锌(负极) → 导线 → 铜(正极)
+  </div>
+</div>
+
+<script>
+  (function() {
+    const canvas = document.getElementById('batteryCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // 状态变量
+    let isCircuitConnected = true;      // 默认连通
+    let currentAmpere = 0.0;           // 模拟电流值 (0 ~ 0.85 A 左右)
+    let targetCurrent = 0.0;
+    
+    // 动画相关
+    let animationFrameId = null;
+    let electrons = [];                // 电子粒子数组
+    const MAX_ELECTRONS = 28;
+    
+    // 指针角度 (弧度)  -PI/6 到 PI/6 之间摆动，对应电流大小
+    let needleAngle = 0.0;            // 当前角度
+    let targetNeedleAngle = 0.0;
+    
+    // 导线路径关键点 (用于电子流动路径，从锌电极经电流表到铜电极)
+    // 坐标基于canvas尺寸 650x420
+    const zincPos = { x: 130, y: 260 };    // 锌电极接触点 (负极)
+    const copperPos = { x: 520, y: 260 };  // 铜电极接触点 (正极)
+    
+    // 电流表位置 (上方中央偏左一点，显示在导线上方)
+    const ammeterCenter = { x: 325, y: 105 };
+    
+    // 导线路径定义：从锌电极 -> 向上 -> 经过电流表 -> 向右 -> 向下到铜电极
+    function getWirePath() {
+      // 返回一系列点构成的路径 (用于绘制电子流动路线)
+      return [
+        { x: zincPos.x, y: zincPos.y },                    // 锌起点
+        { x: zincPos.x, y: 170 },                          // 锌上方垂直段
+        { x: 210, y: 170 },                                // 向左上过渡到电流表左侧
+        { x: 260, y: 110 },                                // 进入电流表左端 (电流表附近)
+        { x: ammeterCenter.x, y: ammeterCenter.y },        // 电流表中心(指针轴)
+        { x: 390, y: 110 },                                // 电流表右端
+        { x: 440, y: 170 },                                // 向右过渡
+        { x: copperPos.x, y: 170 },                        // 铜上方垂直段
+        { x: copperPos.x, y: copperPos.y }                 // 铜终点
+      ];
+    }
+    
+    // 初始化电子粒子 (分布在导线上)
+    function initElectrons() {
+      electrons = [];
+      const path = getWirePath();
+      // 沿路径创建电子，按比例分布
+      for (let i = 0; i < MAX_ELECTRONS; i++) {
+        // t 从0到1 沿路径长度
+        let t = i / (MAX_ELECTRONS - 1);
+        // 稍微随机偏移使流动自然
+        electrons.push({
+          t: t,
+          speed: 0.0,           // 动态速度
+          offset: 0.0,
+        });
+      }
+    }
+    
+    // 根据路径t (0~1) 获取坐标 (线性插值沿折线)
+    function getPointOnPath(t) {
+      const path = getWirePath();
+      if (path.length < 2) return path[0];
+      
+      // 计算总长度和各段长度
+      let segments = [];
+      let totalLength = 0;
+      for (let i = 0; i < path.length - 1; i++) {
+        let dx = path[i+1].x - path[i].x;
+        let dy = path[i+1].y - path[i].y;
+        let len = Math.sqrt(dx*dx + dy*dy);
+        segments.push({ index: i, length: len, start: path[i], end: path[i+1] });
+        totalLength += len;
+      }
+      if (totalLength === 0) return path[0];
+      
+      let targetDist = t * totalLength;
+      let accumulated = 0;
+      for (let seg of segments) {
+        if (accumulated + seg.length >= targetDist) {
+          let localT = (targetDist - accumulated) / seg.length;
+          localT = Math.max(0, Math.min(1, localT));
+          return {
+            x: seg.start.x + (seg.end.x - seg.start.x) * localT,
+            y: seg.start.y + (seg.end.y - seg.start.y) * localT
+          };
+        }
+        accumulated += seg.length;
+      }
+      // 兜底返回终点
+      return path[path.length-1];
+    }
+    
+    // 更新电子位置 (流动)
+    function updateElectrons(deltaTime = 0.016) {
+      if (!isCircuitConnected || currentAmpere < 0.005) {
+        // 断开或电流极小时电子几乎不动
+        for (let e of electrons) {
+          e.speed = 0.0;
+        }
+        return;
+      }
+      
+      // 电子流动速度正比于电流大小 (从锌到铜方向，t增加方向)
+      const baseSpeed = 0.18;  // 基础速度
+      const speedFactor = currentAmpere * 1.4;  // 电流越大流动越快
+      
+      for (let e of electrons) {
+        // 动态速度带一点变化
+        let dynamicSpeed = baseSpeed * speedFactor * (0.8 + 0.4 * Math.sin(e.t * 20 + performance.now() * 0.01));
+        e.t += dynamicSpeed * deltaTime;
+        // 循环流动：到达终点(t>=1)则回到起点附近
+        if (e.t >= 1.0) {
+          e.t = 0.0;
+        }
+        if (e.t < 0.0) e.t = 0.0;
+      }
+    }
+    
+    // 平滑电流及指针角度
+    function smoothValues() {
+      // 目标电流：连通时0.78A左右，断开时0
+      targetCurrent = isCircuitConnected ? 0.78 : 0.0;
+      
+      // 平滑逼近电流值
+      let step = 0.045;
+      if (Math.abs(targetCurrent - currentAmpere) < 0.01) {
+        currentAmpere = targetCurrent;
+      } else if (currentAmpere < targetCurrent) {
+        currentAmpere = Math.min(currentAmpere + step, targetCurrent);
+      } else {
+        currentAmpere = Math.max(currentAmpere - step, targetCurrent);
+      }
+      
+      // 指针角度映射：电流0 -> 角度 -0.45弧度(偏左)，电流0.78 -> +0.45弧度(偏右)
+      const minAngle = -0.48;
+      const maxAngle = 0.48;
+      targetNeedleAngle = minAngle + (currentAmpere / 0.78) * (maxAngle - minAngle);
+      
+      // 平滑指针摆动 (带阻尼)
+      let angleDiff = targetNeedleAngle - needleAngle;
+      needleAngle += angleDiff * 0.22;
+      
+      // 微小的自然抖动 (模拟真实指针轻微震颤)
+      if (isCircuitConnected && currentAmpere > 0.1) {
+        needleAngle += (Math.random() - 0.5) * 0.012;
+      }
+      
+      // 限制范围
+      needleAngle = Math.max(-0.55, Math.min(0.55, needleAngle));
+      
+      // 更新UI显示
+      document.getElementById('currentValue').textContent = currentAmpere.toFixed(2);
+      const led = document.getElementById('statusLed');
+      if (isCircuitConnected && currentAmpere > 0.05) {
+        led.className = 'led on';
+      } else {
+        led.className = 'led';
+      }
+    }
+    
+    // ---------- 绘制图形 ----------
+    function drawBackground(ctx) {
+      // 清空
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // 木质桌面纹理感背景
+      const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      grad.addColorStop(0, '#f7f3e8');
+      grad.addColorStop(0.7, '#e0d6c2');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // 装饰网格线
+      ctx.strokeStyle = '#c0b7a4';
+      ctx.lineWidth = 0.6;
+      for (let i = 0; i < canvas.width; i += 45) {
+        ctx.beginPath();
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i, canvas.height);
+        ctx.strokeStyle = '#d4c9b5';
+        ctx.stroke();
+      }
+    }
+    
+    function drawBeakersAndElectrodes(ctx) {
+      // 左烧杯 (锌/ZnSO4)
+      ctx.save();
+      // 烧杯玻璃
+      ctx.fillStyle = 'rgba(210, 230, 245, 0.25)';
+      ctx.strokeStyle = '#5a6b7a';
+      ctx.lineWidth = 2.8;
+      ctx.beginPath();
+      ctx.rect(70, 210, 115, 130);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(170, 210, 240, 0.2)';
+      ctx.fillRect(72, 212, 111, 126);
+      
+      // 溶液 ZnSO4
+      ctx.fillStyle = 'rgba(175, 210, 235, 0.55)';
+      ctx.beginPath();
+      ctx.rect(73, 245, 109, 92);
+      ctx.fill();
+      ctx.fillStyle = 'rgba(140, 190, 220, 0.65)';
+      ctx.fillRect(75, 260, 105, 74);
+      
+      // 锌电极 (银灰色金属棒)
+      ctx.fillStyle = '#8a9ba8';
+      ctx.shadowColor = '#404040';
+      ctx.shadowBlur = 6;
+      ctx.fillRect(122, 195, 16, 120);
+      ctx.fillStyle = '#bccbd8';
+      ctx.fillRect(124, 197, 12, 116);
+      ctx.fillStyle = '#6d7b8c';
+      ctx.fillRect(126, 200, 8, 110);
+      ctx.shadowBlur = 0;
+      ctx.shadowColor = 'transparent';
+      
+      // 标签 Zn
+      ctx.font = 'bold 15px "Inter", "Segoe UI"';
+      ctx.fillStyle = '#2e3b4e';
+      ctx.fillText('Zn', 108, 185);
+      ctx.font = 'italic 12px "Inter"';
+      ctx.fillStyle = '#1e4460';
+      ctx.fillText('ZnSO₄', 100, 320);
+      
+      // 右烧杯 (铜/ CuSO4)
+      ctx.beginPath();
+      ctx.rect(465, 210, 115, 130);
+      ctx.fillStyle = 'rgba(210, 230, 245, 0.25)';
+      ctx.fill();
+      ctx.strokeStyle = '#5a6b7a';
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(100, 160, 210, 0.25)';
+      ctx.fillRect(467, 212, 111, 126);
+      
+      // CuSO4 溶液 (蓝色调)
+      ctx.fillStyle = 'rgba(70, 140, 210, 0.5)';
+      ctx.beginPath();
+      ctx.rect(468, 245, 109, 92);
+      ctx.fill();
+      ctx.fillStyle = 'rgba(45, 120, 200, 0.7)';
+      ctx.fillRect(470, 255, 105, 79);
+      
+      // 铜电极
+      ctx.fillStyle = '#c97a4b';
+      ctx.shadowBlur = 6;
+      ctx.fillRect(512, 195, 16, 120);
+      ctx.fillStyle = '#e09e6a';
+      ctx.fillRect(514, 197, 12, 116);
+      ctx.fillStyle = '#b56532';
+      ctx.fillRect(516, 200, 8, 110);
+      ctx.shadowBlur = 0;
+      
+      ctx.fillStyle = '#2e3b4e';
+      ctx.fillText('Cu', 522, 185);
+      ctx.fillStyle = '#1e4460';
+      ctx.fillText('CuSO₄', 502, 320);
+      
+      // 盐桥 (U型管连接)
+      ctx.beginPath();
+      ctx.strokeStyle = '#7a6a5c';
+      ctx.lineWidth = 12;
+      ctx.stroke(new Path2D('M185,270 Q250,220 315,270'));
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.strokeStyle = '#b8a58b';
+      ctx.lineWidth = 7;
+      ctx.stroke(new Path2D('M185,270 Q250,222 315,270'));
+      // 盐桥填充
+      ctx.fillStyle = '#dac29c';
+      ctx.beginPath();
+      ctx.ellipse(250, 248, 18, 10, 0, 0, Math.PI*2);
+      ctx.fill();
+      
+      ctx.restore();
+    }
+    
+    function drawAmmeter(ctx) {
+      // 电流表位于上方中央 (ammeterCenter)
+      const cx = ammeterCenter.x;
+      const cy = ammeterCenter.y;
+      
+      ctx.save();
+      ctx.shadowColor = '#333';
+      ctx.shadowBlur = 8;
+      
+      // 表盘背景
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, 54, 44, 0, 0, Math.PI * 2);
+      ctx.fillStyle = '#fcf9f2';
+      ctx.fill();
+      ctx.strokeStyle = '#5a4a3a';
+      ctx.lineWidth = 3.5;
+      ctx.stroke();
+      
+      // 内圈
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, 42, 34, 0, 0, Math.PI*2);
+      ctx.fillStyle = '#fefae0';
+      ctx.fill();
+      ctx.strokeStyle = '#4a3e2c';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      
+      // 刻度线
+      ctx.strokeStyle = '#2f2a1f';
+      ctx.lineWidth = 1.8;
+      for (let i = -5; i <= 5; i++) {
+        let angle = (i / 5) * 0.9; // -0.9 到 0.9 弧度范围
+        let innerX = cx + Math.sin(angle) * 30;
+        let innerY = cy - Math.cos(angle) * 28;
+        let outerX = cx + Math.sin(angle) * 38;
+        let outerY = cy - Math.cos(angle) * 35;
+        ctx.beginPath();
+        ctx.moveTo(innerX, innerY);
+        ctx.lineTo(outerX, outerY);
+        ctx.stroke();
+      }
+      
+      // 数字标签
+      ctx.font = '10px "Inter"';
+      ctx.fillStyle = '#1e1e1e';
+      ctx.fillText('0', cx-4, cy-32);
+      ctx.fillText('0.4', cx+28, cy-15);
+      ctx.fillText('0.8', cx+36, cy+12);
+      
+      // 指针 (动态角度)
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(needleAngle);
+      ctx.beginPath();
+      ctx.moveTo(0, -4);
+      ctx.lineTo(38, 0);
+      ctx.lineTo(0, 4);
+      ctx.closePath();
+      ctx.fillStyle = '#c0392b';
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = '#b03a2e';
+      ctx.fill();
+      ctx.restore();
+      
+      // 中心圆点
+      ctx.beginPath();
+      ctx.arc(cx, cy, 5, 0, 2*Math.PI);
+      ctx.fillStyle = '#2c2c2c';
+      ctx.fill();
+      ctx.shadowBlur = 6;
+      ctx.fillStyle = '#444';
+      ctx.arc(cx, cy, 3, 0, 2*Math.PI);
+      ctx.fill();
+      
+      ctx.restore();
+      
+      // 电流表接线柱标识
+      ctx.fillStyle = '#2d2d2d';
+      ctx.font = 'bold 11px "Inter"';
+      ctx.fillText('−', cx-42, cy-5);
+      ctx.fillText('+', cx+42, cy-5);
+    }
+    
+    function drawWires(ctx) {
+      const path = getWirePath();
+      ctx.save();
+      ctx.beginPath();
+      ctx.strokeStyle = '#4a3a2a';
+      ctx.lineWidth = 5;
+      ctx.shadowBlur = 5;
+      ctx.shadowColor = '#555';
+      ctx.moveTo(path[0].x, path[0].y);
+      for (let i = 1; i < path.length; i++) {
+        ctx.lineTo(path[i].x, path[i].y);
+      }
+      ctx.stroke();
+      
+      // 铜色导线高光
+      ctx.beginPath();
+      ctx.strokeStyle = '#c9a87c';
+      ctx.lineWidth = 2.8;
+      ctx.moveTo(path[0].x, path[0].y-0.5);
+      for (let i = 1; i < path.length; i++) {
+        ctx.lineTo(path[i].x, path[i].y-0.8);
+      }
+      ctx.stroke();
+      ctx.restore();
+    }
+    
+    function drawElectrons(ctx) {
+      if (!isCircuitConnected || currentAmpere < 0.02) return;
+      
+      for (let e of electrons) {
+        let pos = getPointOnPath(e.t);
+        if (!pos) continue;
+        // 电子大小随电流轻微变化
+        let radius = 3.2 + currentAmpere * 0.9;
+        ctx.beginPath();
+        ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI);
+        // 发光电子
+        const gradient = ctx.createRadialGradient(pos.x-1, pos.y-1, 1, pos.x, pos.y, radius+2);
+        gradient.addColorStop(0, '#fcee8f');
+        gradient.addColorStop(0.7, '#f0b34b');
+        ctx.fillStyle = gradient;
+        ctx.shadowColor = '#ffbb2e';
+        ctx.shadowBlur = 9;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.shadowColor = 'transparent';
+        // 白色高光
+        ctx.beginPath();
+        ctx.arc(pos.x-0.8, pos.y-1, 1.2, 0, 2*Math.PI);
+        ctx.fillStyle = '#fffde7';
+        ctx.fill();
+      }
+    }
+    
+    function drawLabels() {
+      ctx.font = '500 13px "Inter"';
+      ctx.fillStyle = '#2d3e4f';
+      ctx.fillText('电子流动方向 →', 270, 68);
+      // 负极正极标识
+      ctx.fillStyle = '#b33e2c';
+      ctx.fillText('负极 (Zn)', 105, 365);
+      ctx.fillStyle = '#2c5f2d';
+      ctx.fillText('正极 (Cu)', 505, 365);
+    }
+    
+    function renderScene() {
+      drawBackground(ctx);
+      drawBeakersAndElectrodes(ctx);
+      drawWires(ctx);
+      drawElectrons(ctx);
+      drawAmmeter(ctx);
+      drawLabels(ctx);
+    }
+    
+    // 动画循环
+    function animationLoop() {
+      smoothValues();
+      updateElectrons(0.016);
+      renderScene();
+      animationFrameId = requestAnimationFrame(animationLoop);
+    }
+    
+    // 事件绑定
+    function setCircuitState(connected) {
+      if (isCircuitConnected === connected) return;
+      isCircuitConnected = connected;
+      
+      // 更新按钮active样式
+      const connectBtn = document.getElementById('connectBtn');
+      const disconnectBtn = document.getElementById('disconnectBtn');
+      if (connected) {
+        connectBtn.classList.add('active');
+        disconnectBtn.classList.remove('active');
+      } else {
+        disconnectBtn.classList.add('active');
+        connectBtn.classList.remove('active');
+      }
+    }
+    
+    function bindEvents() {
+      document.getElementById('connectBtn').addEventListener('click', () => {
+        setCircuitState(true);
+      });
+      document.getElementById('disconnectBtn').addEventListener('click', () => {
+        setCircuitState(false);
+      });
+      
+      // 初始状态连通，按钮激活样式已设定
+      document.getElementById('connectBtn').classList.add('active');
+    }
+    
+    // 启动一切
+    initElectrons();
+    bindEvents();
+    animationLoop();
+    
+    // 清理动画 (非必须，但良好实践)
+    window.addEventListener('beforeunload', () => {
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    });
+  })();
+</script>
+</body>
+</html>
