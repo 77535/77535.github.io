@@ -263,6 +263,76 @@
         .copy-btn:active {
             background: #4338ca;
         }
+        .assistant-card {
+            background: #f8fafc;
+            border: 1px solid #dbeafe;
+            border-radius: 24px;
+            padding: 18px 18px 14px;
+            box-shadow: 0 8px 18px rgba(99, 102, 241, 0.08);
+        }
+        .assistant-chat {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            min-height: 220px;
+            max-height: 300px;
+            padding: 14px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        .assistant-message {
+            max-width: 88%;
+            padding: 12px 14px;
+            border-radius: 18px;
+            line-height: 1.6;
+            font-size: 0.92rem;
+        }
+        .assistant-message.user {
+            background: #eef2ff;
+            color: #1e293b;
+            align-self: flex-end;
+            border-bottom-right-radius: 6px;
+        }
+        .assistant-message.assistant {
+            background: #4f46e5;
+            color: white;
+            align-self: flex-start;
+            border-bottom-left-radius: 6px;
+        }
+        .assistant-input-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .assistant-input-row input {
+            flex: 1;
+            border: 1px solid #cbd5e1;
+            border-radius: 999px;
+            padding: 12px 16px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .assistant-input-row input:focus {
+            border-color: #7c3aed;
+        }
+        .assistant-input-row button {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 999px;
+            padding: 12px 20px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .assistant-input-row button:hover {
+            background: #4338ca;
+        }
         .footer-info {
             text-align: center;
             margin-top: 28px;
@@ -297,21 +367,21 @@
 <div class="container">
     <div class="hero">
         <h1>⚡ 原电池专题学习站</h1>
-        <p>问卷调研 · 高考真题 · 交互式仿真实验</p>
+        <p>习题检测 · 高考真题 · 交互式仿真实验 · H5网页 · AI智能问答助手</p>
         <div class="badge-tip">🔬 点击下方模块，开始学习</div>
     </div>
 
-    <!-- 调查问卷模块 -->
+    <!-- 课堂检测模块 -->
     <div class="category-card">
         <div class="category-title">
             <div class="category-icon">📋</div>
-            <h2>调查问卷</h2>
+            <h2>课堂检测</h2>
         </div>
         <div class="items-list">
-            <a class="resource-item" href="https://v.wjx.cn/vm/Ql713bo.aspx" target="_blank" rel="noopener noreferrer">
+            <a class="resource-item" href="survey.html" target="_blank" rel="noopener noreferrer">
                 <div class="item-icon">📝</div>
                 <div class="item-content">
-                    <div class="item-name">化学“原电池”学习现状及AI工具使用调查</div>
+                    <div class="item-name">化学“原电池”课堂检测</div>
                     <div class="item-desc">匿名问卷，帮助改进教学</div>
                 </div>
                 <div class="arrow-icon">→</div>
@@ -353,6 +423,23 @@
         </div>
         <div style="font-size:0.7rem; color:#5b6e8c; margin-top:12px; text-align:center;">
             💡 点击实验名称，在新页面中运行交互式仿真动画
+        </div>
+    </div>
+
+    <!-- AI 智能问答助手模块 -->
+    <div class="category-card">
+        <div class="category-title">
+            <div class="category-icon">🤖</div>
+            <h2>化学原电池 AI 智能问答助手</h2>
+        </div>
+        <div class="assistant-card">
+            <div class="assistant-chat" id="assistantChatBody">
+                <div class="assistant-message assistant">你好，我是原电池智能助手。请在下面输入你想问的原电池问题，我会尽力为你解答。</div>
+            </div>
+            <div class="assistant-input-row">
+                <input id="assistantInput" type="text" placeholder="例如：放电时电子从哪极流出？" aria-label="输入原电池问题">
+                <button id="assistantSendBtn" type="button">提问</button>
+            </div>
         </div>
     </div>
 
@@ -490,6 +577,164 @@
     toggleAnswerBtn.addEventListener('click', toggleAnswer);
     nextBtn.addEventListener('click', nextQuestion);
     renderCurrentQuestion();
+
+    function setupAssemblyModule() {
+        const partButtons = document.querySelectorAll('.part-item');
+        const slots = document.querySelectorAll('.assembly-slot');
+        const statusEl = document.getElementById('assemblyStatus');
+        const resetBtn = document.getElementById('resetAssemblyBtn');
+        let selectedPart = null;
+
+        const partNames = {
+            Zn: '锌电极 (Zn)',
+            Cu: '铜电极 (Cu)',
+            bridge: '盐桥'
+        };
+
+        function updateSelection() {
+            partButtons.forEach(btn => {
+                btn.classList.toggle('selected', btn.dataset.part === selectedPart);
+            });
+        }
+
+        function showStatus(text, type) {
+            statusEl.textContent = text;
+            statusEl.classList.remove('assembly-success', 'assembly-fail');
+            if (type) statusEl.classList.add(type);
+        }
+
+        function getSlotContent(slot) {
+            return slot.dataset.currentPart || null;
+        }
+
+        function checkCompletion() {
+            const ok = Array.from(slots).every(slot => slot.dataset.currentPart === slot.dataset.accept);
+            if (ok) {
+                showStatus('✅ 组装完成！Zn-Cu 原电池已闭合，开始放电。请观察负极 Zn 溶解、正极 Cu 端出现气泡。', 'assembly-success');
+            } else {
+                const filled = Array.from(slots).filter(slot => slot.dataset.currentPart).length;
+                showStatus(`已放置 ${filled} 个组件，继续完成电池组装。`);
+            }
+        }
+
+        function placePart(slot, part) {
+            if (!part) {
+                showStatus('请先选择一个组件，再点击槽位或拖放到槽位上。', 'assembly-fail');
+                return;
+            }
+            const accept = slot.dataset.accept;
+            if (accept !== part) {
+                showStatus(`该槽位只能放置 ${partNames[accept]}，请重新选择。`, 'assembly-fail');
+                return;
+            }
+            slot.dataset.currentPart = part;
+            slot.classList.add('slot-filled');
+            slot.innerHTML = `<div class="slot-label">${slot.dataset.label}</div><div class="slot-part">${partNames[part]}</div>`;
+            selectedPart = null;
+            updateSelection();
+            checkCompletion();
+        }
+
+        function resetAssembly() {
+            slots.forEach(slot => {
+                slot.dataset.currentPart = '';
+                slot.classList.remove('slot-filled', 'drag-over');
+                slot.innerHTML = `<div class="slot-label">${slot.dataset.label}</div><div class="slot-hint">放 ${partNames[slot.dataset.accept]} 到这里</div>`;
+            });
+            selectedPart = null;
+            updateSelection();
+            showStatus('已重置组装，请重新选择组件。');
+        }
+
+        partButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                selectedPart = button.dataset.part;
+                updateSelection();
+                showStatus(`已选择 ${partNames[selectedPart]}，请放入对应槽位。`);
+            });
+            button.addEventListener('dragstart', event => {
+                event.dataTransfer.setData('text/plain', button.dataset.part);
+            });
+        });
+
+        slots.forEach(slot => {
+            slot.addEventListener('click', () => placePart(slot, selectedPart));
+            slot.addEventListener('dragover', event => {
+                event.preventDefault();
+                slot.classList.add('drag-over');
+            });
+            slot.addEventListener('dragleave', () => {
+                slot.classList.remove('drag-over');
+            });
+            slot.addEventListener('drop', event => {
+                event.preventDefault();
+                slot.classList.remove('drag-over');
+                const part = event.dataTransfer.getData('text/plain');
+                placePart(slot, part);
+            });
+        });
+
+        resetBtn.addEventListener('click', resetAssembly);
+        resetAssembly();
+    }
+
+    const assistantInput = document.getElementById('assistantInput');
+    const assistantSendBtn = document.getElementById('assistantSendBtn');
+    const assistantChatBody = document.getElementById('assistantChatBody');
+
+    const AI_KNOWLEDGE = [
+        { keywords: ['放电', '电子', '流出'], answer: '放电时，电子从负极（活泼金属）出发，经外电路流向正极。' },
+        { keywords: ['负极', '氧化'], answer: '负极在原电池中发生氧化反应，失去电子。' },
+        { keywords: ['正极', '还原'], answer: '正极在原电池中发生还原反应，得到电子。' },
+        { keywords: ['盐桥', '离子'], answer: '盐桥中离子迁移以保持电荷平衡，阴离子向负极区移动，阳离子向正极区移动。' },
+        { keywords: ['电流', '方向'], answer: '电流方向与电子方向相反，从正极经外电路流向负极。' },
+        { keywords: ['电池总反应'], answer: '原电池总反应由两个半反应相加得到：负极氧化+正极还原。' },
+        { keywords: ['锌', '铜'], answer: '在Zn-Cu原电池中，Zn为负极发生氧化，Cu为正极发生还原。' },
+        { keywords: ['电子流动', '锌'], answer: '电子由锌极通过导线流向铜极，带动外电路电流。' },
+        { keywords: ['氢气', '铜'], answer: '铜电极上H⁺得到电子生成H₂气泡。' }
+    ];
+
+    function addAssistantMessage(text, type) {
+        const message = document.createElement('div');
+        message.className = `assistant-message ${type}`;
+        message.textContent = text;
+        assistantChatBody.appendChild(message);
+        assistantChatBody.scrollTop = assistantChatBody.scrollHeight;
+    }
+
+    function findAiAnswer(question) {
+        const lower = question.toLowerCase();
+        for (const item of AI_KNOWLEDGE) {
+            if (item.keywords.every(keyword => lower.includes(keyword))) {
+                return item.answer;
+            }
+        }
+        if (lower.includes('负极') || lower.includes('阳极')) return '负极通常是活泼金属，在放电时发生氧化，电子从此处流出。';
+        if (lower.includes('正极') || lower.includes('阴极')) return '正极是接受电子的电极，发生还原反应。';
+        if (lower.includes('电子') && lower.includes('流向')) return '电子通过外电路从负极流向正极，电流方向相反。';
+        return '这是一个好问题！我当前的知识库还在扩展中，建议你尝试更具体的问题，例如“Zn-Cu原电池中电子如何流动？”或“盐桥中的离子移动方向”。';
+    }
+
+    function sendAssistantQuestion() {
+        const question = assistantInput.value.trim();
+        if (!question) return;
+        addAssistantMessage(question, 'user');
+        assistantInput.value = '';
+        addAssistantMessage('正在思考中...', 'assistant');
+        setTimeout(() => {
+            const lastAssistant = assistantChatBody.querySelector('.assistant-message.assistant:last-child');
+            if (lastAssistant) lastAssistant.remove();
+            addAssistantMessage(findAiAnswer(question), 'assistant');
+        }, 300);
+    }
+
+    assistantSendBtn.addEventListener('click', sendAssistantQuestion);
+    assistantInput.addEventListener('keydown', event => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            sendAssistantQuestion();
+        }
+    });
 </script>
 </body>
 </html>
