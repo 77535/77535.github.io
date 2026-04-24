@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>交互原电池模拟 | 点击导线连接锌铜 | 锌溶解 + 铜气泡</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            background: linear-gradient(145deg, #cfe2ef 0%, #b2c9dc 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', 'Roboto', 'Poppins', system-ui, sans-serif;
+            padding: 20px;
+        }
+
+        .experiment-container {
+            max-width: 1300px;
+            width: 100%;
+            background: rgba(255, 252, 235, 0.96);
+            backdrop-filter: blur(3px);
+            border-radius: 3rem;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.25);
+            padding: 1.8rem 2rem 2rem;
+            transition: all 0.2s;
+        }
+
+        .exp-header {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .exp-header h1 {
+            font-size: 2.1rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1f5729, #358547);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .exp-header p {
+            background: #dbead3aa;
+            display: inline-block;
+            padding: 0.3rem 1.4rem;
+            border-radius: 40px;
+            font-weight: 500;
+            margin-top: 6px;
+        }
+        .return-home-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #4f46e5;
+            color: white;
+            text-decoration: none;
+            border-radius: 999px;
+            padding: 10px 16px;
+            font-weight: 700;
+            box-shadow: 0 14px 28px rgba(79, 70, 229, 0.18);
+            transition: background 0.2s, transform 0.2s;
+            margin-bottom: 18px;
+        }
+        .return-home-btn:hover {
+            background: #4338ca;
+            transform: translateY(-1px);
+        }
+
+        /* 单个烧杯+内部电极 */
+        .beaker-area {
+            display: flex;
+            justify-content: center;
+            margin: 0.5rem 0 0.2rem;
+        }
+        .beaker {
+            position: relative;
+            background: #e2f0f5;
+            border-radius: 0 0 70px 70px;
+            border: 4px solid #bbd2e0;
+            border-top: none;
+            width: 100%;
+            max-width: 780px;
+            min-height: 400px;
+            box-shadow: inset 0 6px 10px rgba(0,0,0,0.05), 0 12px 20px rgba(0,0,0,0.2);
+        }
+        .solution-liquid {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 82%;
+            background: radial-gradient(ellipse at 35% 50%, #89c0d0, #559eb3);
+            border-radius: 0 0 66px 66px;
+            opacity: 0.8;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .electrodes-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding: 35px 45px 25px;
+            position: relative;
+            z-index: 2;
+            gap: 40px;
+        }
+        .electrode-card {
+            flex: 1;
+            text-align: center;
+            background: rgba(250, 250, 240, 0.6);
+            backdrop-filter: blur(4px);
+            border-radius: 48px;
+            padding: 16px 10px 20px;
+            transition: 0.2s;
+        }
+        .electrode-name {
+            font-size: 1.4rem;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .zn-name { color: #2d6a2f; }
+        .cu-name { color: #bd6a2e; }
+
+        .metal-piece {
+            width: 95px;
+            height: 180px;
+            margin: 0 auto;
+            border-radius: 18px 18px 20px 20px;
+            box-shadow: 5px 8px 14px rgba(0,0,0,0.2);
+            transition: filter 0.1s;
+            position: relative;
+            cursor: pointer;
+        }
+        .zn-metal {
+            background: linear-gradient(130deg, #b9d6a8, #7c9e64);
+            border: 2px solid #4f6a3b;
+        }
+        .cu-metal {
+            background: linear-gradient(130deg, #e8b482, #c27a34);
+            border: 2px solid #a5551f;
+        }
+        /* 溶解覆盖层（锌） */
+        .dissolve-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 70%, rgba(60,100,40,0.5), rgba(40,70,20,0.1));
+            border-radius: 18px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            mix-blend-mode: multiply;
+        }
+        /* 气泡层（铜） */
+        .bubble-layer {
+            position: absolute;
+            bottom: 5px;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 20;
+            overflow: visible;
+        }
+        .bubble {
+            position: absolute;
+            background: radial-gradient(circle at 30% 30%, rgba(220, 250, 255, 0.95), rgba(80, 180, 210, 0.7));
+            border-radius: 50%;
+            box-shadow: 0 0 6px #c0ffff;
+            animation: riseUp linear infinite;
+        }
+        @keyframes riseUp {
+            0% { transform: translateY(0) scale(0.6); opacity: 0.9; }
+            100% { transform: translateY(-220px) scale(1.3); opacity: 0; }
+        }
+
+        /* 连接按钮区域 */
+        .connection-panel {
+            margin: 1.5rem 0 1rem;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            align-items: center;
+            background: #eef3e7cc;
+            border-radius: 80px;
+            padding: 12px 24px;
+        }
+        .connect-btn {
+            background: linear-gradient(145deg, #3c5e3a, #234d24);
+            border: none;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            padding: 10px 24px;
+            border-radius: 48px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .connect-btn:hover {
+            transform: scale(1.02);
+            background: linear-gradient(145deg, #4c754a, #2c5e2a);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+        .connect-btn:active {
+            transform: scale(0.98);
+        }
+        .disconnect-btn {
+            background: linear-gradient(145deg, #6a4e3a, #543b2a);
+        }
+        .status-badge {
+            background: #2d2f2b;
+            padding: 6px 18px;
+            border-radius: 40px;
+            color: #ffea9e;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        /* 导线视觉（连接时出现） */
+        .wire-visual {
+            position: absolute;
+            top: -48px;
+            left: 12%;
+            width: 76%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(12px);
+            border-radius: 60px;
+            padding: 5px 18px;
+            gap: 12px;
+            z-index: 30;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+            border: 1px solid #f3cd7a;
+            transition: all 0.2s;
+            pointer-events: none;
+        }
+        .wire-end-label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: #ffea9e;
+        }
+        .wire-line-middle {
+            flex: 1;
+            height: 6px;
+            background: repeating-linear-gradient(90deg, #d99e4a, #d99e4a 12px, #f5c882 12px, #f5c882 24px);
+            border-radius: 6px;
+            transition: 0.2s;
+        }
+        .electron-animation {
+            font-size: 0.7rem;
+            background: #fff1b5;
+            color: #b45f1b;
+            padding: 2px 10px;
+            border-radius: 30px;
+            font-weight: bold;
+            animation: flowGlow 0.8s infinite alternate;
+        }
+        @keyframes flowGlow {
+            from { background: #fff1b5; box-shadow: 0 0 2px gold; }
+            to { background: #ffe282; box-shadow: 0 0 10px #ffb347; }
+        }
+
+        /* 连接引线装饰（从导线连到电极的视觉） */
+        .connector-line-left, .connector-line-right {
+            position: absolute;
+            width: 3px;
+            background: radial-gradient(#e7a153, #aa6f39);
+            top: 32px;
+            height: 26px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 4px;
+            z-index: 25;
+        }
+        .wire-visual .wire-end-label {
+            position: relative;
+        }
+
+        /* 反应信息 */
+        .reaction-panel {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-top: 0.8rem;
+            margin-bottom: 0.6rem;
+        }
+        .reaction-chip {
+            background: #1a452a;
+            color: #eefde3;
+            padding: 5px 18px;
+            border-radius: 36px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .exp-footnote {
+            background: #e1eddaaa;
+            border-radius: 2rem;
+            padding: 10px 24px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+            font-size: 0.85rem;
+        }
+        footer {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #336b44;
+            margin-top: 1rem;
+        }
+
+        /* 粒子canvas */
+        .particle-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 12;
+            border-radius: 18px;
+        }
+
+        @media (max-width: 700px) {
+            .metal-piece { width: 70px; height: 140px; }
+            .electrodes-row { padding: 20px 20px; gap: 20px; }
+            .connect-btn { font-size: 1rem; padding: 6px 18px; }
+        }
+    </style>
+</head>
+<body>
+<div class="experiment-container">
+    <a class="return-home-btn" href="index.html">← 返回主界面</a>
+    <div class="exp-header">
+        <h1>🧪 交互式原电池 · 点击导线连接锌铜 🧪</h1>
+        <p>同一烧杯 | 锌片溶解 + 铜片大量气泡 | 动态连接导线，观察电子流动</p>
+    </div>
+
+    <div class="beaker-area">
+        <div class="beaker">
+            <div class="solution-liquid"></div>
+            <!-- 动态导线视觉层 (默认隐藏) -->
+            <div id="wireVisual" class="wire-visual" style="display: none;">
+                <div class="wire-end-label">🔩 锌极</div>
+                <div class="wire-line-middle" id="animatedWireLine"></div>
+                <div class="electron-animation" id="electronFlowText">e⁻ 流动 →</div>
+                <div class="wire-end-label">🔴 铜极</div>
+                <div class="connector-line-left" style="left: 12%;"></div>
+                <div class="connector-line-right" style="left: 88%;"></div>
+            </div>
+
+            <div class="electrodes-row">
+                <!-- 锌电极 -->
+                <div class="electrode-card" id="znCard">
+                    <div class="electrode-name"><span class="zn-name">⚡ 锌电极 (阳极)</span></div>
+                    <div class="metal-piece zn-metal" id="znMetalPiece">
+                        <div class="dissolve-overlay" id="dissolveOverlayZn"></div>
+                        <canvas id="znParticleCanvas" class="particle-canvas"></canvas>
+                    </div>
+                    <div style="margin-top: 10px; font-size:0.75rem; background:#517a46aa; border-radius:20px; display:inline-block; padding:4px 12px;">Zn → Zn²⁺ + 2e⁻</div>
+                </div>
+
+                <!-- 铜电极 -->
+                <div class="electrode-card" id="cuCard">
+                    <div class="electrode-name"><span class="cu-name">🔴 铜电极 (阴极)</span></div>
+                    <div class="metal-piece cu-metal" id="cuMetalPiece">
+                        <div id="bubbleContainerCu" class="bubble-layer"></div>
+                    </div>
+                    <div style="margin-top: 10px; font-size:0.75rem; background:#b45f2baa; border-radius:20px; display:inline-block; padding:4px 12px;">2H⁺ + 2e⁻ → H₂↑</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 交互控制区：连接/断开导线 -->
+    <div class="connection-panel">
+        <button id="connectWireBtn" class="connect-btn">🔌 连接导线 (点击) 🔌</button>
+        <button id="disconnectWireBtn" class="connect-btn disconnect-btn">⛔ 断开导线 ⛔</button>
+        <div id="connStatus" class="status-badge">⚡ 状态: 导线未连接</div>
+    </div>
+
+    <div class="reaction-panel">
+        <div class="reaction-chip">🧪 氧化半反应: Zn → Zn²⁺ + 2e⁻</div>
+        <div class="reaction-chip">💧 还原半反应: 2H⁺ + 2e⁻ → H₂↑</div>
+        <div class="reaction-chip" id="electronHint">🔌 导线断开: 无电子流动</div>
+    </div>
+
+    <div class="exp-footnote">
+        <span>✅ 点击【连接导线】- 模拟锌铜原电池通路</span>
+        <span>✅ 锌片开始溶解 (粒子效果 + 光泽变化)</span>
+        <span>✅ 铜片表面产生大量氢气气泡</span>
+        <span>✅ 断开导线后反应停止，现象消失</span>
+    </div>
+    <footer>⚡ 交互化学模拟 | 点击连接导线，观察原电池现象 | 锌溶解 & 铜析氢 ⚡</footer>
+</div>
+
+<script>
+    (function() {
+        // DOM 元素
+        const connectBtn = document.getElementById('connectWireBtn');
+        const disconnectBtn = document.getElementById('disconnectWireBtn');
+        const connStatusSpan = document.getElementById('connStatus');
+        const wireVisualDiv = document.getElementById('wireVisual');
+        const electronHintSpan = document.getElementById('electronHint');
+        const electronFlowSpan = document.getElementById('electronFlowText');
+        
+        // 现象控制标记
+        let isConnected = false;      // 导线是否连接
+        
+        // 气泡 & 粒子 相关句柄
+        let bubbleInterval = null;
+        let particleAnimationId = null;
+        let znParticles = [];
+        let znCtx = null;
+        let znCanvas = document.getElementById('znParticleCanvas');
+        let dissolveOverlay = document.getElementById('dissolveOverlayZn');
+        let znMetalDiv = document.getElementById('znMetalPiece');
+        let cuMetalDiv = document.getElementById('cuMetalPiece');
+        
+        // ---------- 锌溶解粒子效果 (canvas) ----------
+        function resizeZnCanvas() {
+            if (!znCanvas) return;
+            const parent = znCanvas.parentElement;
+            if (!parent) return;
+            const rect = parent.getBoundingClientRect();
+            znCanvas.width = rect.width;
+            znCanvas.height = rect.height;
+            znCanvas.style.width = `${rect.width}px`;
+            znCanvas.style.height = `${rect.height}px`;
+            if (znCtx) znCtx.clearRect(0, 0, znCanvas.width, znCanvas.height);
+        }
+        
+        class ZnIonParticle {
+            constructor(w, h, metalRect) {
+                this.x = (metalRect.x + metalRect.w * 0.2) + Math.random() * metalRect.w * 0.7;
+                this.y = (metalRect.y + metalRect.h * 0.5) + Math.random() * metalRect.h * 0.45;
+                this.size = 2 + Math.random() * 6;
+                this.vx = (Math.random() - 0.5) * 0.7;
+                this.vy = -0.6 - Math.random() * 1.4;
+                this.life = 1.0;
+                this.decay = 0.008 + Math.random() * 0.015;
+                this.alpha = 0.8;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life -= this.decay;
+                this.alpha = this.life * 0.9;
+                return this.life > 0;
+            }
+            draw(ctx) {
+                ctx.globalAlpha = this.alpha * 0.9;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size * (0.5 + this.life * 0.5), 0, Math.PI*2);
+                ctx.fillStyle = `rgba(85, 140, 70, ${this.alpha*0.85})`;
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        }
+        
+        function getMetalRectRelative() {
+            if (!znCanvas || !znMetalDiv) return { x: 20, y: 20, w: 80, h: 160 };
+            const canvasRect = znCanvas.getBoundingClientRect();
+            const metalRect = znMetalDiv.getBoundingClientRect();
+            const relX = metalRect.left - canvasRect.left;
+            const relY = metalRect.top - canvasRect.top;
+            return { x: relX, y: relY, w: metalRect.width, h: metalRect.height };
+        }
+        
+        function addZnParticles() {
+            if (!isConnected) return; // 只有连接时才产生溶解粒子
+            const metalArea = getMetalRectRelative();
+            if (metalArea.w <= 5 || metalArea.h <= 5) return;
+            const count = Math.floor(Math.random() * 2) + 1;
+            for (let i = 0; i < count; i++) {
+                if (znParticles.length < 280) {
+                    znParticles.push(new ZnIonParticle(znCanvas.width, znCanvas.height, metalArea));
+                }
+            }
+        }
+        
+        function animateZnParticles() {
+            if (!znCtx || !znCanvas) return;
+            znCtx.clearRect(0, 0, znCanvas.width, znCanvas.height);
+            for (let i = znParticles.length-1; i >= 0; i--) {
+                if (!znParticles[i].update()) {
+                    znParticles.splice(i,1);
+                } else {
+                    znParticles[i].draw(znCtx);
+                }
+            }
+            if (isConnected) {
+                addZnParticles();
+            }
+            requestAnimationFrame(animateZnParticles);
+        }
+        
+        function initZnParticleSystem() {
+            if (!znCanvas) return;
+            znCtx = znCanvas.getContext('2d');
+            if (!znCtx) return;
+            resizeZnCanvas();
+            window.addEventListener('resize', () => {
+                resizeZnCanvas();
+                znParticles = [];
+            });
+            animateZnParticles();
+        }
+        
+        // ----- 铜气泡特效 (依据连接状态) -----
+        const bubbleContainer = document.getElementById('bubbleContainerCu');
+        
+        function createBubble() {
+            if (!bubbleContainer) return null;
+            const rect = bubbleContainer.getBoundingClientRect();
+            if (rect.width === 0) return null;
+            const bubble = document.createElement('div');
+            bubble.classList.add('bubble');
+            const size = 6 + Math.random() * 20;
+            bubble.style.width = `${size}px`;
+            bubble.style.height = `${size}px`;
+            const leftPos = 12 + Math.random() * 76;
+            bubble.style.left = `${leftPos}%`;
+            bubble.style.bottom = `${5 + Math.random() * 28}px`;
+            const duration = 1.0 + Math.random() * 1.8;
+            bubble.style.animationDuration = `${duration}s`;
+            bubbleContainer.appendChild(bubble);
+            setTimeout(() => { if(bubble && bubble.remove) bubble.remove(); }, duration * 1000);
+            return bubble;
+        }
+        
+        function startBubbles() {
+            if (bubbleInterval) clearInterval(bubbleInterval);
+            if (!isConnected) return;
+            bubbleInterval = setInterval(() => {
+                if (!isConnected) {
+                    if (bubbleInterval) clearInterval(bubbleInterval);
+                    return;
+                }
+                const batch = Math.floor(Math.random() * 5) + 3; // 大量气泡
+                for (let i=0; i<batch; i++) createBubble();
+            }, 95);
+        }
+        
+        function stopBubbles() {
+            if (bubbleInterval) {
+                clearInterval(bubbleInterval);
+                bubbleInterval = null;
+            }
+            // 清除现有所有气泡，干净
+            if (bubbleContainer) {
+                while (bubbleContainer.firstChild) bubbleContainer.removeChild(bubbleContainer.firstChild);
+            }
+        }
+        
+        // ---- 锌溶解视觉增强 (覆盖层+亮度) ----
+        let dissolveInterval = null;
+        let znBrightInterval = null;
+        let cuGlowInterval = null;
+        
+        function startDissolveVisuals() {
+            if (dissolveInterval) clearInterval(dissolveInterval);
+            if (!isConnected) return;
+            if (dissolveOverlay) {
+                dissolveInterval = setInterval(() => {
+                    if (!isConnected) {
+                        if (dissolveOverlay) dissolveOverlay.style.opacity = '0';
+                        return;
+                    }
+                    const cur = parseFloat(dissolveOverlay.style.opacity);
+                    if (isNaN(cur) || cur < 0.3) dissolveOverlay.style.opacity = '0.55';
+                    else if (dissolveOverlay.style.opacity === '0.55') dissolveOverlay.style.opacity = '0.85';
+                    else dissolveOverlay.style.opacity = '0.55';
+                }, 550);
+            }
+            // 锌片亮度呼吸
+            if (znBrightInterval) clearInterval(znBrightInterval);
+            if (znMetalDiv) {
+                znBrightInterval = setInterval(() => {
+                    if (!isConnected) {
+                        znMetalDiv.style.filter = 'brightness(1)';
+                        return;
+                    }
+                    const bright = 0.78 + Math.sin(Date.now() / 460) * 0.16;
+                    znMetalDiv.style.filter = `brightness(${bright}) drop-shadow(0 0 2px #79a35c)`;
+                }, 280);
+            }
+            // 铜片亮点微闪
+            if (cuGlowInterval) clearInterval(cuGlowInterval);
+            if (cuMetalDiv) {
+                cuGlowInterval = setInterval(() => {
+                    if (!isConnected) {
+                        cuMetalDiv.style.filter = 'brightness(1)';
+                        return;
+                    }
+                    const flick = 0.88 + Math.random() * 0.22;
+                    cuMetalDiv.style.filter = `brightness(${flick})`;
+                }, 450);
+            }
+        }
+        
+        function stopDissolveVisuals() {
+            if (dissolveInterval) { clearInterval(dissolveInterval); dissolveInterval = null; }
+            if (znBrightInterval) { clearInterval(znBrightInterval); znBrightInterval = null; }
+            if (cuGlowInterval) { clearInterval(cuGlowInterval); cuGlowInterval = null; }
+            if (dissolveOverlay) dissolveOverlay.style.opacity = '0';
+            if (znMetalDiv) znMetalDiv.style.filter = 'brightness(1)';
+            if (cuMetalDiv) cuMetalDiv.style.filter = 'brightness(1)';
+        }
+        
+        // 导线连接时的界面更新
+        function updateWireVisual(connected) {
+            if (connected) {
+                wireVisualDiv.style.display = 'flex';
+                connStatusSpan.innerHTML = '⚡ 状态: 导线已连接 · 电路通路 ⚡';
+                electronHintSpan.innerHTML = '🔌 导线已连接: 电子从锌流向铜 → 反应剧烈进行';
+                if (electronFlowSpan) electronFlowSpan.innerHTML = '⚡ e⁻ 从锌 → 铜 ⚡';
+                // 动态流动文字加强
+                let flowToggle = false;
+                if (window._flowInterval) clearInterval(window._flowInterval);
+                window._flowInterval = setInterval(() => {
+                    if (!isConnected) {
+                        if (electronFlowSpan) electronFlowSpan.innerHTML = '⚡ 导线未连接 ⚡';
+                        return;
+                    }
+                    flowToggle = !flowToggle;
+                    if (electronFlowSpan) {
+                        if (flowToggle) electronFlowSpan.innerHTML = '⚡✨ 电子定向移动 ✨⚡';
+                        else electronFlowSpan.innerHTML = '➡️ e⁻ 流向铜极 ⬅️';
+                    }
+                    const wireLine = document.getElementById('animatedWireLine');
+                    if(wireLine) {
+                        wireLine.style.boxShadow = flowToggle ? '0 0 10px #ffb347' : '0 0 4px #d99e4a';
+                        wireLine.style.background = flowToggle ? 'repeating-linear-gradient(90deg, #f5bc70, #f5bc70 12px, #ffdd99 12px, #ffdd99 24px)' : 'repeating-linear-gradient(90deg, #d99e4a, #d99e4a 12px, #f5c882 12px, #f5c882 24px)';
+                    }
+                }, 700);
+            } else {
+                wireVisualDiv.style.display = 'none';
+                connStatusSpan.innerHTML = '⛔ 状态: 导线未连接 · 断路 ⛔';
+                electronHintSpan.innerHTML = '🔌 导线断开: 无电子流动，反应停止';
+                if (electronFlowSpan) electronFlowSpan.innerHTML = '🔌 导线未连接 🔌';
+                if (window._flowInterval) { clearInterval(window._flowInterval); window._flowInterval = null; }
+            }
+        }
+        
+        // 开启所有反应 (连接后)
+        function enableReaction() {
+            if (isConnected) return;
+            isConnected = true;
+            updateWireVisual(true);
+            // 启动气泡
+            stopBubbles(); // 确保先停再启
+            startBubbles();
+            // 启动锌粒子系统 和 溶解视觉
+            startDissolveVisuals();
+            // 确保粒子画板持续产生粒子 (动画本身一直在跑，但是add粒子依赖isConnected标志)
+            // 如果目前粒子数组为空也无妨，先清一下现有粒子
+            znParticles = [];
+        }
+        
+        // 关闭所有反应 (断开)
+        function disableReaction() {
+            if (!isConnected) return;
+            isConnected = false;
+            updateWireVisual(false);
+            stopBubbles();
+            stopDissolveVisuals();
+            // 清空锌粒子画板残留
+            if (znCtx && znCanvas) znCtx.clearRect(0, 0, znCanvas.width, znCanvas.height);
+            znParticles = [];
+            // 额外清除气泡任何遗留
+            if (bubbleContainer) {
+                while (bubbleContainer.firstChild) bubbleContainer.removeChild(bubbleContainer.firstChild);
+            }
+            // 重置溶解覆盖层透明度
+            if (dissolveOverlay) dissolveOverlay.style.opacity = '0';
+        }
+        
+        // 连接按钮逻辑
+        connectBtn.addEventListener('click', () => {
+            if (isConnected) return;
+            enableReaction();
+        });
+        disconnectBtn.addEventListener('click', () => {
+            if (!isConnected) return;
+            disableReaction();
+        });
+        
+        // 初始状态：无连接，无反应，但显示装置
+        isConnected = false;
+        updateWireVisual(false);
+        // 确保无气泡、无溶解。
+        stopBubbles();
+        stopDissolveVisuals();
+        if (dissolveOverlay) dissolveOverlay.style.opacity = '0';
+        if (znCtx && znCanvas) znCtx.clearRect(0, 0, znCanvas.width, znCanvas.height);
+        
+        // 初始化粒子系统
+        if (znCanvas) {
+            initZnParticleSystem();
+            resizeZnCanvas();
+        } else {
+            console.warn("canvas missing");
+        }
+        
+        // 窗口resize时重新调整canvas尺寸
+        window.addEventListener('resize', () => {
+            if (znCanvas && znCtx) {
+                resizeZnCanvas();
+                znCtx.clearRect(0, 0, znCanvas.width, znCanvas.height);
+                znParticles = [];
+            }
+        });
+        
+        // 额外添加点击电极引导说明 小提示（无强制逻辑）
+        console.log("交互原电池已启动 — 点击「连接导线」按钮观察锌溶解和铜气泡");
+    })();
+</script>
+</body>
+</html>
