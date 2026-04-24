@@ -2,1333 +2,781 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>原电池原理 - 交互式演示 | 丹尼尔电池</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>高中化学·原电池互动教学实验室 | 动态模拟与动手组装</title>
     <style>
-        :root {
-            --bg: #1a1d23;
-            --panel-bg: #21252b;
-            --text: #e0e0e0;
-            --text-secondary: #a0a8b4;
-            --accent: #f0a040;
-            --accent-blue: #5b9bd5;
-            --accent-copper: #c47a4a;
-            --accent-zinc: #8a8a95;
-            --btn-bg: #2a3040;
-            --btn-hover: #353d50;
-            --btn-active: #3a4560;
-            --border: #3a3f4b;
-            --glow: rgba(240, 160, 64, 0.5);
-            --danger: #e0556a;
-            --success: #5cb878;
-            --step-active: #f0a040;
-            --step-done: #5cb878;
-            --step-inactive: #4a4f5a;
-        }
-
         * {
-            margin: 0;
-            padding: 0;
             box-sizing: border-box;
+            user-select: none; /* 避免拖动干扰，不影响文字选择 */
         }
 
         body {
-            background: var(--bg);
-            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 16px;
-            color: var(--text);
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
+            font-family: 'Segoe UI', 'Roboto', 'Noto Sans', system-ui, -apple-system, '微软雅黑', sans-serif;
+            background: linear-gradient(145deg, #f0f7ff 0%, #e9f0fa 100%);
+            margin: 0;
+            padding: 20px;
+            color: #1a2c3e;
         }
 
+        /* 主容器 */
         .container {
-            background: var(--panel-bg);
-            border-radius: 20px;
-            padding: 24px 20px 20px;
-            max-width: 960px;
-            width: 100%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--border);
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-        .header h1 {
-            font-size: clamp(1.2rem, 2.2vw, 1.6rem);
-            font-weight: 700;
-            letter-spacing: 0.02em;
-            background: linear-gradient(135deg, #f0c060, #f08040);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        h1 {
+            text-align: center;
+            font-size: 2.2rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #1e6f3f, #2b7a4b, #0f4c2c);
             background-clip: text;
-        }
-        .badge {
-            font-size: 0.78rem;
-            background: var(--btn-bg);
-            color: var(--text-secondary);
-            padding: 5px 12px;
-            border-radius: 20px;
-            letter-spacing: 0.04em;
-            border: 1px solid var(--border);
-            white-space: nowrap;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 0.25rem;
+            letter-spacing: -0.5px;
         }
 
-        .canvas-wrap {
-            position: relative;
-            background: #181b21;
-            border-radius: 14px;
-            overflow: hidden;
-            border: 1px solid var(--border);
-            aspect-ratio: 16 / 10;
-            min-height: 340px;
-            cursor: default;
-        }
-        .canvas-wrap canvas {
-            display: block;
-            width: 100%;
-            height: 100%;
+        .sub {
+            text-align: center;
+            color: #2c5a3b;
+            margin-bottom: 30px;
+            font-weight: 500;
+            border-bottom: 2px solid #bcd0aa;
+            display: inline-block;
+            width: auto;
+            margin-left: auto;
+            margin-right: auto;
+            padding-bottom: 6px;
         }
 
-        .info-panel {
-            background: #1e2229;
-            border-radius: 12px;
-            padding: 14px 18px;
-            border: 1px solid var(--border);
+        /* 两列布局 */
+        .dashboard {
             display: flex;
             flex-wrap: wrap;
-            align-items: center;
-            gap: 12px;
-            min-height: 56px;
-        }
-        .step-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            font-weight: 700;
-            flex-shrink: 0;
-            background: var(--btn-bg);
-            border: 2px solid var(--step-active);
-            color: var(--step-active);
-            transition: all 0.4s;
-        }
-        .step-info {
-            flex: 1;
-            min-width: 180px;
-        }
-        .step-title {
-            font-weight: 700;
-            font-size: 1rem;
-            color: #fff;
-        }
-        .step-desc {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-top: 2px;
-            line-height: 1.4;
-        }
-        .equation {
-            font-family: 'SF Mono', 'Consolas', 'Courier New', 'Noto Sans SC', monospace;
-            font-size: 0.9rem;
-            background: #15181e;
-            padding: 8px 14px;
-            border-radius: 8px;
-            color: #f0c060;
-            white-space: nowrap;
-            letter-spacing: 0.03em;
-            border: 1px solid #2a2d35;
-            flex-shrink: 0;
-        }
-        .equation .arrow {
-            color: #e0556a;
-            margin: 0 4px;
-        }
-        .equation .electron {
-            color: #ffcc00;
-            font-size: 0.75rem;
+            gap: 30px;
+            margin-bottom: 40px;
         }
 
-        .controls {
+        /* 教学演示区卡片 */
+        .demo-card {
+            flex: 1.2;
+            min-width: 550px;
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(2px);
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.2);
+            padding: 20px;
+            transition: all 0.2s;
+            border: 1px solid rgba(80,120,70,0.3);
+        }
+
+        .assembly-card {
+            flex: 0.9;
+            min-width: 450px;
+            background: rgba(255,255,248,0.9);
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.2);
+            padding: 20px;
+            border: 1px solid #d4e2c6;
+        }
+
+        .card-title {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
             gap: 10px;
+            border-left: 6px solid #2e7d32;
+            padding-left: 15px;
+            color: #1f4f2b;
+        }
+
+        /* canvas 区域 */
+        .canvas-container {
+            background: #fefef7;
+            border-radius: 28px;
+            padding: 12px;
+            box-shadow: inset 0 1px 4px #0001, 0 8px 20px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            background: #fffcf0;
+            border-radius: 24px;
+            cursor: pointer;
+        }
+
+        /* 控制栏 */
+        .control-bar {
+            display: flex;
             flex-wrap: wrap;
-            justify-content: center;
+            gap: 12px;
+            margin: 18px 0 12px;
+            align-items: center;
+            justify-content: space-between;
         }
-        .btn {
-            padding: 10px 18px;
-            border-radius: 25px;
-            border: 1px solid var(--border);
-            background: var(--btn-bg);
-            color: #d0d4dc;
-            cursor: pointer;
-            font-size: 0.9rem;
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        button, .select-style {
+            background: #f5f7fa;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 40px;
             font-weight: 600;
-            letter-spacing: 0.03em;
-            transition: all 0.2s;
-            white-space: nowrap;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
             font-family: inherit;
+            border: 1px solid #cbdcd0;
         }
-        .return-home-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: #4f46e5;
+
+        button:hover {
+            background: #e0f0e4;
+            transform: translateY(-2px);
+            border-color: #5f9e6e;
+        }
+
+        .primary-btn {
+            background: #2b7a4b;
             color: white;
-            text-decoration: none;
-            border-radius: 999px;
-            padding: 10px 16px;
-            font-weight: 700;
-            box-shadow: 0 14px 30px rgba(79, 70, 229, 0.22);
-            transition: background 0.2s, transform 0.2s;
-            margin-bottom: 12px;
-        }
-        .return-home-btn:hover {
-            background: #4338ca;
-            transform: translateY(-1px);
-        }
-        .btn:hover {
-            background: var(--btn-hover);
-            border-color: #5a5f6b;
-            color: #fff;
-        }
-        .btn:active {
-            background: var(--btn-active);
-            transform: scale(0.96);
-        }
-        .btn.primary {
-            background: var(--accent);
-            border-color: var(--accent);
-            color: #1a1d23;
-            font-weight: 700;
-        }
-        .btn.primary:hover {
-            background: #f5b855;
-            border-color: #f5b855;
-        }
-        .btn:disabled {
-            opacity: 0.35;
-            cursor: not-allowed;
-            pointer-events: none;
+            border: none;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
         }
 
-        .step-dots {
+        .primary-btn:hover {
+            background: #1e5e3a;
+            transform: scale(0.98);
+        }
+
+        select {
+            background: white;
+            padding: 8px 14px;
+            border-radius: 32px;
+            border: 1px solid #b9cfb0;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .step-explanation {
+            background: #eaf4e3;
+            border-radius: 28px;
+            padding: 12px 18px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            border-left: 5px solid #388e3c;
+        }
+
+        .param-row {
             display: flex;
-            gap: 8px;
+            gap: 16px;
+            flex-wrap: wrap;
             align-items: center;
-        }
-        .step-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--step-inactive);
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid transparent;
-        }
-        .step-dot.active {
-            background: var(--step-active);
-            box-shadow: 0 0 12px var(--glow);
-            border-color: #f5c060;
-            width: 14px;
-            height: 14px;
-        }
-        .step-dot.done {
-            background: var(--step-done);
-            border-color: #7ed89a;
-        }
-        .step-dot:hover {
-            border-color: #fff8;
-            transform: scale(1.3);
+            background: #f0f5ea;
+            padding: 8px 14px;
+            border-radius: 48px;
+            margin-top: 8px;
         }
 
-        .speed-label {
-            font-size: 0.78rem;
-            color: var(--text-secondary);
-            letter-spacing: 0.03em;
-            white-space: nowrap;
-        }
-        .speed-slider {
-            -webkit-appearance: none;
-            width: 70px;
-            height: 6px;
-            border-radius: 3px;
-            background: #3a3f4b;
-            outline: none;
-            cursor: pointer;
-        }
-        .speed-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            background: #d0d4dc;
-            cursor: pointer;
-            border: 2px solid #5a5f6b;
+        .voltage-value {
+            font-family: monospace;
+            font-weight: bold;
+            background: #1a2c2f;
+            color: #e6ffdb;
+            padding: 4px 12px;
+            border-radius: 36px;
+            font-size: 1rem;
         }
 
-        @media (max-width: 640px) {
-            .container {
-                padding: 12px 8px 10px;
-                border-radius: 14px;
-                gap: 10px;
+        hr {
+            margin: 18px 0;
+            border-color: #cfe3cf;
+        }
+
+        .assembly-area {
+            margin-top: 15px;
+        }
+
+        .assembly-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: #fafef5;
+            padding: 15px;
+            border-radius: 24px;
+        }
+
+        .option-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .feedback {
+            background: #2d3e2b20;
+            border-radius: 28px;
+            padding: 10px 15px;
+            margin-top: 15px;
+            font-weight: 500;
+        }
+
+        @media (max-width: 1050px) {
+            .dashboard {
+                flex-direction: column;
             }
-            .canvas-wrap {
-                border-radius: 10px;
-                min-height: 240px;
+            .demo-card, .assembly-card {
+                min-width: auto;
             }
-            .btn {
-                padding: 8px 12px;
-                font-size: 0.78rem;
-                border-radius: 20px;
-            }
-            .equation {
-                font-size: 0.72rem;
-                padding: 6px 10px;
-            }
-            .info-panel {
-                padding: 10px 12px;
-                gap: 8px;
-            }
+        }
+        .badge {
+            background: #f9c74f;
+            border-radius: 30px;
+            padding: 2px 12px;
+            font-size: 0.7rem;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
+<div class="container">
+    <h1>⚡ 原电池互动教学实验室 ⚡</h1>
+    <div style="text-align: center"><span class="sub">电子流动 · 离子迁移 · 自主探究</span></div>
 
-    <div class="container">
-        <a class="return-home-btn" href="index.html">← 返回主界面</a>
-        <!-- 头部 -->
-        <div class="header">
-            <h1>⚡ 原电池原理 · 丹尼尔电池</h1>
-            <span class="badge">Zn-Cu ｜ 交互演示</span>
-        </div>
-
-        <!-- 画布 -->
-        <div class="canvas-wrap" id="canvasWrap">
-            <canvas id="mainCanvas"></canvas>
-        </div>
-
-        <!-- 信息面板 -->
-        <div class="info-panel" id="infoPanel">
-            <div class="step-icon" id="stepIcon">1</div>
-            <div class="step-info">
-                <div class="step-title" id="stepTitle">装置总览</div>
-                <div class="step-desc" id="stepDesc">丹尼尔电池由锌电极（阳极）、铜电极（阴极）、盐桥和导线组成。</div>
+    <div class="dashboard">
+        <!-- 左侧：教学演示模块 (铜锌原电池/水果电池 + 条件改变 + 分步讲解) -->
+        <div class="demo-card">
+            <div class="card-title">🧪 动态实验展示区 <span class="badge">经典案例+交互调节</span></div>
+            <div class="canvas-container">
+                <canvas id="demoCanvas" width="700" height="380" style="width:100%; height:auto; max-width:700px; aspect-ratio:700/380"></canvas>
             </div>
-            <div class="equation" id="equationDisplay">Zn + Cu²⁺ <span class="arrow">→</span> Zn²⁺ + Cu</div>
+            
+            <!-- 案例切换 + 条件改变控件 -->
+            <div class="param-row">
+                <span>🔁 电池案例：</span>
+                <select id="caseSelect">
+                    <option value="cu_zn">铜锌原电池 (稀硫酸)</option>
+                    <option value="fruit">水果电池 (柠檬/铜锌)</option>
+                </select>
+                <span id="conditionLabel">⚙️ 调节参数：</span>
+                <select id="conditionSelect">
+                    <option value="normal">标准状态</option>
+                    <option value="highConc">高浓度电解质 → 电流增强</option>
+                    <option value="lowConc">低浓度电解质 → 电流减弱</option>
+                </select>
+                <span id="extraOption"></span>
+            </div>
+
+            <!-- 动画控制栏 -->
+            <div class="control-bar">
+                <div class="btn-group">
+                    <button id="playPauseDemoBtn">⏸️ 暂停</button>
+                    <button id="resetAnimDemoBtn">🔄 重置动画</button>
+                </div>
+                <div class="btn-group">
+                    <button id="stepPrevBtn">◀ 上一步</button>
+                    <button id="stepNextBtn">下一步 ▶</button>
+                </div>
+                <div><span class="voltage-value" id="demoVoltageDisplay">⚡ 电压: 1.10 V</span></div>
+            </div>
+            
+            <!-- 分步讲解区域 -->
+            <div class="step-explanation" id="stepTextDemo">
+                <strong>📖 分步讲解 (共4步)</strong><br>
+                <span id="stepDetail">步骤1: 负极Zn失去电子，发生氧化反应 Zn → Zn²⁺ + 2e⁻</span>
+            </div>
+            <div style="font-size: 0.75rem; color: #4a6741; margin-top: 8px;">💡 提示: 点击“下一步”高亮对应区域，动画自动暂停观察微观过程</div>
         </div>
 
-        <!-- 控制按钮 -->
-        <div class="controls">
-            <button class="btn" id="btnPrev" title="上一步">◀ 上一步</button>
-            <button class="btn primary" id="btnPlay" title="自动播放">▶ 自动演示</button>
-            <button class="btn" id="btnNext" title="下一步">下一步 ▶</button>
-            <span style="color:#5a5f6b;">│</span>
-            <div class="step-dots" id="stepDots"></div>
-            <span style="color:#5a5f6b;">│</span>
-            <span class="speed-label">速度</span>
-            <input type="range" class="speed-slider" id="speedSlider" min="0.3" max="2.5" step="0.1" value="1" title="动画速度">
-            <button class="btn" id="btnReset" title="重置">↺ 重置</button>
+        <!-- 右侧：动手组装区  (学生自主组合) -->
+        <div class="assembly-card">
+            <div class="card-title">🛠️ 动手组装实验室 <span class="badge">自由搭配 · 验证原理</span></div>
+            <div class="canvas-container">
+                <canvas id="assemblyCanvas" width="700" height="380" style="width:100%; height:auto; max-width:700px; aspect-ratio:700/380"></canvas>
+            </div>
+            <div class="assembly-area">
+                <div class="assembly-options">
+                    <div class="option-row">
+                        <span>🔴 负极材料 (活泼金属):</span>
+                        <select id="anodeSelect">
+                            <option value="Zn">锌 (Zn)</option>
+                            <option value="Mg">镁 (Mg)</option>
+                            <option value="Al">铝 (Al)</option>
+                        </select>
+                    </div>
+                    <div class="option-row">
+                        <span>🟢 正极材料 (导体):</span>
+                        <select id="cathodeSelect">
+                            <option value="Cu">铜 (Cu)</option>
+                            <option value="C">石墨 (C)</option>
+                            <option value="Ag">银 (Ag)</option>
+                        </select>
+                    </div>
+                    <div class="option-row">
+                        <span>🧪 电解质溶液:</span>
+                        <select id="electrolyteSelect">
+                            <option value="H2SO4">稀硫酸 (H₂SO₄)</option>
+                            <option value="lemon">柠檬汁 (酸性)</option>
+                            <option value="NaCl">食盐水 (中性)</option>
+                        </select>
+                    </div>
+                    <div class="btn-group" style="justify-content: center;">
+                        <button id="assembleBtn" class="primary-btn">🔧 组装并运行电池</button>
+                        <button id="pauseAssemblyBtn">⏸️ 暂停/播放</button>
+                    </div>
+                </div>
+                <div class="feedback" id="assemblyFeedback">
+                    💡 点击「组装并运行」—— 观察电子流动和离子迁移，验证原电池构成条件！
+                </div>
+                <div id="assemblyVoltage" class="voltage-value" style="background:#1e3a2f; text-align:center;">电压: -- V</div>
+            </div>
         </div>
     </div>
+</div>
 
-    <script>
-        (function() {
-            // ============ DOM 元素 ============
-            const canvas = document.getElementById('mainCanvas');
-            const ctx = canvas.getContext('2d');
-            const canvasWrap = document.getElementById('canvasWrap');
-            const btnPrev = document.getElementById('btnPrev');
-            const btnNext = document.getElementById('btnNext');
-            const btnPlay = document.getElementById('btnPlay');
-            const btnReset = document.getElementById('btnReset');
-            const speedSlider = document.getElementById('speedSlider');
-            const stepDotsContainer = document.getElementById('stepDots');
-            const stepIcon = document.getElementById('stepIcon');
-            const stepTitle = document.getElementById('stepTitle');
-            const stepDesc = document.getElementById('stepDesc');
-            const equationDisplay = document.getElementById('equationDisplay');
-
-            // ============ 状态管理 ============
-            const TOTAL_STEPS = 6;
-            let currentStep = 0; // 0-5
-            let isAutoPlaying = false;
-            let autoPlayTimer = null;
-            let animationSpeed = 1.0;
-            let globalTime = 0;
-            let animationId = null;
-
-            // 步骤数据
-            const stepData = [
-                { icon: '🔬', title: '装置总览', desc: '丹尼尔电池：锌电极（左·阳极）浸入ZnSO₄溶液，铜电极（右·阴极）浸入CuSO₄溶液，盐桥连接两池，导线连接电极。',
-                    eq: 'Zn | ZnSO₄(aq) || CuSO₄(aq) | Cu' },
-                { icon: '1', title: '阳极氧化 · 锌溶解',
-                    desc: '锌电极失去电子被氧化：Zn原子变成Zn²⁺离子进入溶液，电子留在电极上。', eq: 'Zn <span class="arrow">→</span> Zn²⁺ + <span class="electron">2e⁻</span>（氧化）' },
-                { icon: '2', title: '电子流动 · 导线传导',
-                    desc: '电子(e⁻)从锌电极经外部导线流向铜电极，形成电流。灯泡发光证明有电荷流动。', eq: '<span class="electron">e⁻</span> 经导线：Zn <span class="arrow">→</span> Cu' },
-                { icon: '3', title: '阴极还原 · 铜沉积',
-                    desc: '铜电极接受了电子，溶液中Cu²⁺在铜电极表面获得电子被还原，沉积为金属铜。',
-                    eq: 'Cu²⁺ + <span class="electron">2e⁻</span> <span class="arrow">→</span> Cu（还原）' },
-                { icon: '4', title: '盐桥 · 离子迁移',
-                    desc: '盐桥中K⁺向阴极区(Cu侧)迁移，Cl⁻向阳极区(Zn侧)迁移，维持两池电荷平衡，使反应持续进行。',
-                eq: 'K⁺ → 阴极侧 ｜ Cl⁻ → 阳极侧' },
-                { icon: '✓', title: '总反应 · 化学能→电能',
-                    desc: '总反应：Zn + Cu²⁺ → Zn²⁺ + Cu。锌被氧化，铜离子被还原，化学能转化为电能（约1.10V）。',
-                    eq: 'Zn + Cu²⁺ <span class="arrow">→</span> Zn²⁺ + Cu  <span style="color:#aaa;">E°≈1.10V</span>' },
-            ];
-
-            // ============ Canvas 坐标系统 ============
-            const DESIGN_W = 900;
-            const DESIGN_H = 560;
-            let scale = 1;
-            let offsetX = 0;
-            let offsetY = 0;
-
-            function updateScale() {
-                const rect = canvasWrap.getBoundingClientRect();
-                const w = rect.width;
-                const h = rect.height;
-                const s = Math.min(w / DESIGN_W, h / DESIGN_H);
-                scale = s;
-                offsetX = (w - DESIGN_W * s) / 2;
-                offsetY = (h - DESIGN_H * s) / 2;
-                canvas.width = w * (window.devicePixelRatio || 1);
-                canvas.height = h * (window.devicePixelRatio || 1);
-                canvas.style.width = w + 'px';
-                canvas.style.height = h + 'px';
+<script>
+    (function(){
+        // ----------------------------- 演示模块 (Demo) -----------------------------
+        const demoCanvas = document.getElementById('demoCanvas');
+        const ctxDemo = demoCanvas.getContext('2d');
+        let demoAnimId = null;
+        let demoPlaying = true;
+        let demoStep = 0;          // 分步讲解步骤 0~3
+        let demoHighlight = null;   // 高亮区域 'anode','cathode','solution','wire'
+        
+        // 当前演示参数
+        let demoType = "cu_zn";     // 'cu_zn' or 'fruit'
+        let demoCondition = "normal"; // 'normal','highConc','lowConc'
+        let demoVoltage = 1.10;
+        let electronSpeedFactor = 1.0;
+        
+        // 动画粒子数据 (演示模块)
+        let demoElectrons = [];      // 电子位置 0~1 表示从负极到正极的进度
+        let demoIons = [];           // 离子粒子 {type:'cation'/'anion', x, y, target}
+        
+        // 固定尺寸参数 (相对坐标)
+        const canvasW = 700, canvasH = 380;
+        demoCanvas.width = canvasW;
+        demoCanvas.height = canvasH;
+        
+        // 电极位置: 左负右正
+        const anodeX = 150, cathodeX = 550, electrodeY = 200;
+        const wireStart = {x: anodeX+30, y: electrodeY-45}; // 导线起点
+        const wireEnd = {x: cathodeX-30, y: electrodeY-45};
+        
+        // 初始化粒子
+        function initDemoParticles() {
+            demoElectrons = [];
+            for(let i=0;i<6;i++) {
+                demoElectrons.push({ progress: Math.random() }); // 随机位置
             }
-
-            function resizeCanvas() {
-                updateScale();
+            demoIons = [];
+            for(let i=0;i<12;i++) {
+                let isCation = Math.random() > 0.5;
+                demoIons.push({
+                    type: isCation ? 'cation' : 'anion',
+                    x: anodeX + 30 + Math.random() * (cathodeX - anodeX - 60),
+                    y: electrodeY + 30 + Math.random() * 80,
+                    vx: (Math.random() - 0.5)*0.4,
+                    vy: (Math.random() - 0.5)*0.4
+                });
             }
-
-            // ============ 关键坐标（设计坐标） ============
-            // 左烧杯
-            const beakerL = { x: 115, y: 155, w: 175, h: 250, cx: 202, solutionTop: 195, solutionBot: 400 };
-            // 右烧杯
-            const beakerR = { x: 610, y: 155, w: 175, h: 250, cx: 697, solutionTop: 195, solutionBot: 400 };
-            // 电极
-            const electrodeZn = { x: 202, topY: 108, botY: 355, width: 16 };
-            const electrodeCu = { x: 697, topY: 108, botY: 355, width: 16 };
-            // 盐桥
-            const saltBridge = {
-                leftX: 250,
-                rightX: 648,
-                topY: 148,
-                innerRadius: 9,
-                outerRadius: 14,
-                leftDipY: 270,
-                rightDipY: 270,
-            };
-            // 灯泡
-            const bulb = { x: 450, y: 62, radius: 22 };
-            // 导线路径关键点
-            const wirePath = [
-                { x: electrodeZn.x, y: electrodeZn.topY }, // 锌电极顶部
-                { x: electrodeZn.x - 35, y: electrodeZn.topY },
-                { x: electrodeZn.x - 35, y: 52 },
-                { x: bulb.x - bulb.radius - 6, y: 52 },
-                { x: bulb.x - bulb.radius - 6, y: bulb.y }, // 灯泡左
-                { x: bulb.x + bulb.radius + 6, y: bulb.y }, // 灯泡右
-                { x: bulb.x + bulb.radius + 6, y: 52 },
-                { x: electrodeCu.x + 35, y: 52 },
-                { x: electrodeCu.x + 35, y: electrodeCu.topY },
-                { x: electrodeCu.x, y: electrodeCu.topY }, // 铜电极顶部
-            ];
-
-            // 简化导线路径用于粒子（更多插值点）
-            function buildDetailedWirePath() {
-                const pts = [];
-                const raw = wirePath;
-                for (let i = 0; i < raw.length - 1; i++) {
-                    const a = raw[i];
-                    const b = raw[i + 1];
-                    const dist = Math.hypot(b.x - a.x, b.y - a.y);
-                    const segments = Math.max(4, Math.floor(dist / 8));
-                    for (let j = 0; j < segments; j++) {
-                        const t = j / segments;
-                        pts.push({
-                            x: a.x + (b.x - a.x) * t,
-                            y: a.y + (b.y - a.y) * t,
-                        });
-                    }
-                }
-                pts.push(raw[raw.length - 1]);
-                return pts;
-            }
-            const detailedWirePath = buildDetailedWirePath();
-
-            // 盐桥中心路径
-            function buildSaltBridgePath() {
-                const sb = saltBridge;
-                const pts = [];
-                // 从左端向上
-                const lx = sb.leftX;
-                const rx = sb.rightX;
-                const topY = sb.topY;
-                const lDip = sb.leftDipY;
-                const rDip = sb.rightDipY;
-                // 左竖直段
-                for (let y = lDip; y >= topY; y -= 4) pts.push({ x: lx, y });
-                // 水平段
-                for (let x = lx; x <= rx; x += 4) pts.push({ x, y: topY });
-                // 右竖直段
-                for (let y = topY; y <= rDip; y += 4) pts.push({ x: rx, y });
-                return pts;
-            }
-            const saltBridgePath = buildSaltBridgePath();
-
-            // ============ 粒子系统 ============
-            class Particle {
-                constructor(type) {
-                    this.type = type; // 'electron' | 'zn-ion' | 'cu-ion' | 'k-ion' | 'cl-ion'
-                    this.reset();
-                }
-                reset() {
-                    switch (this.type) {
-                        case 'electron':
-                            this.pathIndex = Math.floor(Math.random() * detailedWirePath.length);
-                            this.speed = 0.6 + Math.random() * 1.0;
-                            this.size = 2.5 + Math.random() * 2;
-                            this.alpha = 0.7 + Math.random() * 0.3;
-                            break;
-                        case 'zn-ion':
-                            this.x = electrodeZn.x + (Math.random() - 0.5) * 22;
-                            this.y = electrodeZn.botY - Math.random() * 80;
-                            this.vx = (Math.random() - 0.5) * 1.5;
-                            this.vy = (Math.random() - 0.5) * 1.5 - 0.3;
-                            this.size = 3 + Math.random() * 3;
-                            this.life = 1;
-                            this.alpha = 0.6 + Math.random() * 0.4;
-                            break;
-                        case 'cu-ion':
-                            this.x = electrodeCu.x + (Math.random() - 0.5) * 140;
-                            this.y = beakerR.solutionTop + Math.random() * (beakerR.solutionBot - beakerR.solutionTop -
-                                20);
-                            this.vx = (Math.random() - 0.5) * 1.3;
-                            this.vy = (Math.random() - 0.5) * 1.3;
-                            this.size = 3 + Math.random() * 3;
-                            this.life = 1;
-                            this.alpha = 0.55 + Math.random() * 0.45;
-                            this.attracted = false;
-                            break;
-                        case 'k-ion':
-                            this.pathIndex = Math.floor(Math.random() * saltBridgePath.length);
-                            this.speed = 0.35 + Math.random() * 0.5;
-                            this.size = 2 + Math.random() * 2.5;
-                            this.alpha = 0.5 + Math.random() * 0.5;
-                            this.direction = 1; // 向右(向阴极)
-                            break;
-                        case 'cl-ion':
-                            this.pathIndex = Math.floor(Math.random() * saltBridgePath.length);
-                            this.speed = 0.35 + Math.random() * 0.5;
-                            this.size = 2 + Math.random() * 2.5;
-                            this.alpha = 0.5 + Math.random() * 0.5;
-                            this.direction = -1; // 向左(向阳极)
-                            break;
-                    }
-                }
-                update(dt, step) {
-                    const spd = dt * animationSpeed;
-                    switch (this.type) {
-                        case 'electron':
-                            if (step >= 2) {
-                                this.pathIndex += this.speed * spd * 18;
-                                if (this.pathIndex >= detailedWirePath.length) this.pathIndex = 0;
-                                if (this.pathIndex < 0) this.pathIndex = detailedWirePath.length - 1;
-                            }
-                            break;
-                        case 'zn-ion':
-                            if (step >= 1) {
-                                this.x += this.vx * spd * 25;
-                                this.y += this.vy * spd * 25;
-                                this.life -= spd * 0.015;
-                                // 边界
-                                const lb = beakerL.x + 8;
-                                const rb2 = beakerL.x + beakerL.w - 8;
-                                const tb = beakerL.solutionTop + 5;
-                                const bb = beakerL.solutionBot - 5;
-                                if (this.x < lb) { this.x = lb;
-                                    this.vx *= -0.6; }
-                                if (this.x > rb2) { this.x = rb2;
-                                    this.vx *= -0.6; }
-                                if (this.y < tb) { this.y = tb;
-                                    this.vy *= -0.6; }
-                                if (this.y > bb) { this.y = bb;
-                                    this.vy *= -0.6; }
-                                if (this.life <= 0) this.reset();
-                                // 随机扰动
-                                this.vx += (Math.random() - 0.5) * 0.3 * spd;
-                                this.vy += (Math.random() - 0.5) * 0.3 * spd;
-                                const mag = Math.hypot(this.vx, this.vy);
-                                const maxV = 2.5;
-                                if (mag > maxV) { const s = maxV / mag;
-                                    this.vx *= s;
-                                    this.vy *= s; }
-                            }
-                            break;
-                        case 'cu-ion':
-                            if (step >= 3) {
-                                // 向铜电极吸引
-                                const dx3 = electrodeCu.x - this.x;
-                                const dy3 = electrodeCu.y - this.y;
-                                const dist3 = Math.hypot(dx3, dy3);
-                                if (dist3 < 90 && this.life > 0.1) {
-                                    this.attracted = true;
-                                }
-                                if (this.attracted && dist3 > 1) {
-                                    const force = 2.5 / (dist3 + 3);
-                                    this.vx += dx3 / dist3 * force * spd * 30;
-                                    this.vy += dy3 / dist3 * force * spd * 30;
-                                } else if (!this.attracted) {
-                                    this.vx += (Math.random() - 0.5) * 0.25 * spd;
-                                    this.vy += (Math.random() - 0.5) * 0.25 * spd;
-                                }
-                                this.x += this.vx * spd * 25;
-                                this.y += this.vy * spd * 25;
-                                // 边界
-                                const lb2 = beakerR.x + 8;
-                                const rb3 = beakerR.x + beakerR.w - 8;
-                                const tb2 = beakerR.solutionTop + 5;
-                                const bb2 = beakerR.solutionBot - 5;
-                                if (this.x < lb2) this.x = lb2;
-                                if (this.x > rb3) this.x = rb3;
-                                if (this.y < tb2) this.y = tb2;
-                                if (this.y > bb2) this.y = bb2;
-                                // 靠近电极则沉积（重置）
-                                if (dist3 < 8 && this.attracted) {
-                                    this.reset();
-                                    this.attracted = false;
-                                }
-                                const mag2 = Math.hypot(this.vx, this.vy);
-                                const maxV2 = 3;
-                                if (mag2 > maxV2) { const s2 = maxV2 / mag2;
-                                    this.vx *= s2;
-                                    this.vy *= s2; }
-                            }
-                            break;
-                        case 'k-ion':
-                            if (step >= 4) {
-                                this.pathIndex += this.speed * spd * 8 * this.direction;
-                                if (this.pathIndex >= saltBridgePath.length) this.pathIndex = 0;
-                                if (this.pathIndex < 0) this.pathIndex = saltBridgePath.length - 1;
-                            }
-                            break;
-                        case 'cl-ion':
-                            if (step >= 4) {
-                                this.pathIndex += this.speed * spd * 8 * this.direction;
-                                if (this.pathIndex >= saltBridgePath.length) this.pathIndex = saltBridgePath.length - 1;
-                                if (this.pathIndex < 0) this.pathIndex = 0;
-                            }
-                            break;
-                    }
-                }
-                getPosition() {
-                    switch (this.type) {
-                        case 'electron':
-                            const idx = Math.floor(this.pathIndex) % detailedWirePath.length;
-                            const idx2 = (idx + 1) % detailedWirePath.length;
-                            const frac = this.pathIndex - Math.floor(this.pathIndex);
-                            const p1 = detailedWirePath[Math.max(0, idx)];
-                            const p2 = detailedWirePath[Math.max(0, idx2)];
-                            return {
-                                x: p1.x + (p2.x - p1.x) * frac,
-                                y: p1.y + (p2.y - p1.y) * frac,
-                            };
-                        case 'zn-ion':
-                        case 'cu-ion':
-                            return { x: this.x, y: this.y };
-                        case 'k-ion':
-                        case 'cl-ion':
-                            const si = Math.floor(this.pathIndex) % saltBridgePath.length;
-                            const si2 = (si + 1) % saltBridgePath.length;
-                            const sf = this.pathIndex - Math.floor(this.pathIndex);
-                            const sp1 = saltBridgePath[Math.max(0, si)];
-                            const sp2 = saltBridgePath[Math.max(0, si2)];
-                            return {
-                                x: sp1.x + (sp2.x - sp1.x) * sf,
-                                y: sp1.y + (sp2.y - sp1.y) * sf,
-                            };
-                    }
-                }
-            }
-
-            // 创建粒子
-            const electrons = [];
-            const znIons = [];
-            const cuIons = [];
-            const kIons = [];
-            const clIons = [];
-            const NUM_ELECTRONS = 22;
-            const NUM_ZN_IONS = 20;
-            const NUM_CU_IONS = 20;
-            const NUM_K_IONS = 16;
-            const NUM_CL_IONS = 16;
-
-            function initParticles() {
-                electrons.length = 0;
-                znIons.length = 0;
-                cuIons.length = 0;
-                kIons.length = 0;
-                clIons.length = 0;
-                for (let i = 0; i < NUM_ELECTRONS; i++) electrons.push(new Particle('electron'));
-                for (let i = 0; i < NUM_ZN_IONS; i++) znIons.push(new Particle('zn-ion'));
-                for (let i = 0; i < NUM_CU_IONS; i++) cuIons.push(new Particle('cu-ion'));
-                for (let i = 0; i < NUM_K_IONS; i++) kIons.push(new Particle('k-ion'));
-                for (let i = 0; i < NUM_CL_IONS; i++) clIons.push(new Particle('cl-ion'));
-            }
-
-            // ============ 绘图函数 ============
-            function drawBeaker(bx, by, bw, bh, solutionTop, solutionBot, solutionColor, label, labelY) {
-                // 玻璃烧杯
-                const glassThick = 5;
-                // 外壁
-                ctx.save();
-                ctx.strokeStyle = '#c8cdd5';
-                ctx.lineWidth = 3;
-                ctx.lineJoin = 'round';
+        }
+        
+        // 根据条件更新电压/速度因子
+        function updateDemoParamsByCondition() {
+            let baseV = (demoType === 'cu_zn') ? 1.10 : 0.95;
+            if(demoType === 'fruit') baseV = 0.95;
+            if(demoCondition === 'highConc') { baseV *= 1.25; electronSpeedFactor = 1.5; }
+            else if(demoCondition === 'lowConc') { baseV *= 0.65; electronSpeedFactor = 0.6; }
+            else { electronSpeedFactor = 1.0; }
+            demoVoltage = Math.round(baseV * 100)/100;
+            document.getElementById('demoVoltageDisplay').innerText = `⚡ 电压: ${demoVoltage} V`;
+        }
+        
+        // 切换案例特殊处理 (电极材料名称)
+        function getDemoElectrodes() {
+            if(demoType === 'cu_zn') return { anode: "Zn", cathode: "Cu", electrolyte: "稀H₂SO₄" };
+            else return { anode: "Zn", cathode: "Cu", electrolyte: "柠檬酸 (水果)" };
+        }
+        
+        // 绘制演示模块 (含高亮)
+        function drawDemoWithHighlight() {
+            const electrodes = getDemoElectrodes();
+            drawBattery(ctxDemo, canvasW, canvasH, electrodes.anode, electrodes.cathode, electrodes.electrolyte, demoVoltage, demoHighlight);
+            // 额外绘制动态粒子 (电子流和离子)
+            drawParticles(ctxDemo, demoElectrons, demoIons, anodeX, cathodeX, electrodeY);
+        }
+        
+        // 通用电池绘图 (静态元素)
+        function drawBattery(ctx, w, h, anodeName, cathodeName, electrolyteName, voltage, highlightZone) {
+            ctx.clearRect(0,0,w,h);
+            // 背景
+            ctx.fillStyle = "#fffcf0";
+            ctx.fillRect(0,0,w,h);
+            // 烧杯
+            ctx.beginPath();
+            ctx.moveTo(80, 120);
+            ctx.lineTo(620, 120);
+            ctx.lineTo(600, 330);
+            ctx.lineTo(100, 330);
+            ctx.closePath();
+            ctx.fillStyle = "#e8f0e3c0";
+            ctx.fill();
+            ctx.strokeStyle = "#6b8c5c";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            // 电解质文字
+            ctx.font = "500 14px 'Segoe UI'";
+            ctx.fillStyle = "#2b4f2e";
+            ctx.fillText(`电解质: ${electrolyteName}`, w/2-70, 100);
+            
+            // 电极 + 标注
+            // 负极(左)
+            ctx.fillStyle = "#b87333";
+            ctx.shadowBlur=0;
+            ctx.fillRect(anodeX-20, electrodeY-50, 40, 100);
+            ctx.fillStyle = "#cd7f42";
+            ctx.fillRect(anodeX-18, electrodeY-48, 36, 96);
+            ctx.fillStyle = "#4a2a1a";
+            ctx.font = "bold 18px 'Segoe UI'";
+            ctx.fillText(anodeName, anodeX-8, electrodeY-65);
+            ctx.fillStyle = "#5a3e2a";
+            ctx.font = "14px sans-serif";
+            ctx.fillText("负极", anodeX-8, electrodeY+65);
+            // 正极(右)
+            ctx.fillStyle = "#b87333";
+            ctx.fillRect(cathodeX-20, electrodeY-50, 40, 100);
+            ctx.fillStyle = "#e8a75c";
+            ctx.fillRect(cathodeX-18, electrodeY-48, 36, 96);
+            ctx.fillStyle = "#4a2a1a";
+            ctx.font = "bold 18px 'Segoe UI'";
+            ctx.fillText(cathodeName, cathodeX-8, electrodeY-65);
+            ctx.fillStyle = "#5a3e2a";
+            ctx.fillText("正极", cathodeX-8, electrodeY+65);
+            
+            // 导线 (弧线)
+            ctx.beginPath();
+            ctx.moveTo(anodeX+22, electrodeY-35);
+            ctx.quadraticCurveTo(anodeX+150, electrodeY-80, cathodeX-22, electrodeY-35);
+            ctx.strokeStyle = "#5a5a5a";
+            ctx.lineWidth = 5;
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(anodeX+22, electrodeY-35);
+            ctx.quadraticCurveTo(anodeX+150, electrodeY-80, cathodeX-22, electrodeY-35);
+            ctx.strokeStyle = "#ffd966";
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+            
+            // 灯泡示意
+            ctx.beginPath();
+            ctx.arc(anodeX+180, electrodeY-68, 18, 0, Math.PI*2);
+            ctx.fillStyle = "#fff3b0";
+            ctx.fill();
+            ctx.fillStyle = "#c97e00";
+            ctx.font = "20px sans-serif";
+            ctx.fillText("💡", anodeX+171, electrodeY-62);
+            
+            // 高亮区域
+            if(highlightZone === 'anode') {
+                ctx.globalAlpha = 0.35;
+                ctx.fillStyle = "#ffec80";
+                ctx.fillRect(anodeX-28, electrodeY-60, 56, 125);
+                ctx.globalAlpha = 1;
+            } else if(highlightZone === 'cathode') {
+                ctx.globalAlpha = 0.35;
+                ctx.fillStyle = "#ffec80";
+                ctx.fillRect(cathodeX-28, electrodeY-60, 56, 125);
+                ctx.globalAlpha = 1;
+            } else if(highlightZone === 'wire') {
                 ctx.beginPath();
-                ctx.moveTo(bx, by);
-                ctx.lineTo(bx, by + bh);
-                ctx.lineTo(bx + bw, by + bh);
-                ctx.lineTo(bx + bw, by);
+                ctx.moveTo(anodeX+22, electrodeY-35);
+                ctx.quadraticCurveTo(anodeX+150, electrodeY-80, cathodeX-22, electrodeY-35);
+                ctx.lineWidth = 14;
+                ctx.strokeStyle = "#ffd966cc";
                 ctx.stroke();
-                // 玻璃高光
-                ctx.strokeStyle = 'rgba(255,255,255,0.25)';
-                ctx.lineWidth = 1.5;
+            } else if(highlightZone === 'solution') {
+                ctx.globalAlpha = 0.3;
+                ctx.fillStyle = "#b5e0a0";
+                ctx.fillRect(100, 150, 500, 160);
+                ctx.globalAlpha = 1;
+            }
+            
+            // 电压表指示
+            ctx.font = "bold 14px monospace";
+            ctx.fillStyle = "#1f5438";
+            ctx.fillText(`电压: ${voltage} V`, w-120, 50);
+        }
+        
+        // 绘制粒子 (电子流动 + 离子迁移)
+        function drawParticles(ctx, electrons, ions, anodeXPos, cathodeXPos, elecY) {
+            // 电子沿导线移动: 路径插值
+            for(let e of electrons) {
+                let t = e.progress;
+                let startX = anodeXPos+22, startY = elecY-35;
+                let endX = cathodeXPos-22, endY = elecY-35;
+                let cx = anodeXPos+150, cy = elecY-80;
+                let x = (1-t)*(1-t)*startX + 2*(1-t)*t*cx + t*t*endX;
+                let y = (1-t)*(1-t)*startY + 2*(1-t)*t*cy + t*t*endY;
                 ctx.beginPath();
-                ctx.moveTo(bx + 4, by + 10);
-                ctx.lineTo(bx + 4, by + bh - 10);
-                ctx.stroke();
-                // 底部加厚
-                ctx.fillStyle = 'rgba(180,190,200,0.5)';
-                ctx.fillRect(bx - 2, by + bh - 3, bw + 4, 8);
-                ctx.restore();
-
-                // 溶液
-                const solTop = solutionTop;
-                const solBot = solutionBot;
-                ctx.save();
-                ctx.fillStyle = solutionColor;
-                ctx.beginPath();
-                ctx.moveTo(bx + glassThick, solTop);
-                ctx.lineTo(bx + bw - glassThick, solTop);
-                ctx.lineTo(bx + bw - glassThick, solBot);
-                ctx.lineTo(bx + glassThick, solBot);
-                ctx.closePath();
+                ctx.arc(x, y, 6, 0, Math.PI*2);
+                ctx.fillStyle = "#ffc107";
+                ctx.shadowBlur = 8;
                 ctx.fill();
-                // 液面光泽
-                const solGrad = ctx.createLinearGradient(bx, solTop, bx, solTop + 6);
-                solGrad.addColorStop(0, 'rgba(255,255,255,0.35)');
-                solGrad.addColorStop(1, 'rgba(255,255,255,0)');
-                ctx.fillStyle = solGrad;
-                ctx.fillRect(bx + glassThick, solTop, bw - glassThick * 2, 5);
-                ctx.restore();
-
-                // 标签
-                ctx.fillStyle = '#c8cdd5';
-                ctx.font = '13px "PingFang SC","Microsoft YaHei","Segoe UI",sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText(label, bx + bw / 2, labelY);
-            }
-
-            function drawElectrode(x, botY, topY, width, color, highlightColor) {
-                ctx.save();
-                // 主体
-                const grad = ctx.createLinearGradient(x - width / 2, 0, x + width / 2, 0);
-                grad.addColorStop(0, color);
-                grad.addColorStop(0.35, highlightColor);
-                grad.addColorStop(0.65, highlightColor);
-                grad.addColorStop(1, color);
-                ctx.fillStyle = grad;
-                ctx.fillRect(x - width / 2, topY, width, botY - topY);
-                // 边框
-                ctx.strokeStyle = 'rgba(0,0,0,0.35)';
-                ctx.lineWidth = 1.5;
-                ctx.strokeRect(x - width / 2, topY, width, botY - topY);
-                // 顶部圆头
-                ctx.fillStyle = highlightColor;
-                ctx.beginPath();
-                ctx.arc(x, topY, width / 2, 0, Math.PI * 2);
+                ctx.fillStyle = "#f5a623";
+                ctx.arc(x, y, 3, 0, Math.PI*2);
                 ctx.fill();
-                ctx.strokeStyle = 'rgba(0,0,0,0.3)';
-                ctx.stroke();
-                // 底部
-                ctx.fillStyle = color;
-                ctx.fillRect(x - width / 2, botY - 3, width, 6);
-                ctx.restore();
             }
-
-            function drawSaltBridge() {
-                const sb = saltBridge;
-                ctx.save();
-                // 外管
-                ctx.strokeStyle = '#bcc3cc';
-                ctx.lineWidth = sb.outerRadius * 2;
-                ctx.lineCap = 'round';
-                ctx.lineJoin = 'round';
+            ctx.shadowBlur = 0;
+            // 离子迁移 (简单动画)
+            for(let ion of ions) {
                 ctx.beginPath();
-                ctx.moveTo(sb.leftX, sb.leftDipY);
-                ctx.lineTo(sb.leftX, sb.topY);
-                ctx.lineTo(sb.rightX, sb.topY);
-                ctx.lineTo(sb.rightX, sb.rightDipY);
-                ctx.stroke();
-                // 内管（填充物）
-                ctx.strokeStyle = '#e8dcc8';
-                ctx.lineWidth = sb.innerRadius * 2;
-                ctx.beginPath();
-                ctx.moveTo(sb.leftX, sb.leftDipY);
-                ctx.lineTo(sb.leftX, sb.topY);
-                ctx.lineTo(sb.rightX, sb.topY);
-                ctx.lineTo(sb.rightX, sb.rightDipY);
-                ctx.stroke();
-                // 玻璃高光
-                ctx.strokeStyle = 'rgba(255,255,255,0.3)';
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.moveTo(sb.leftX - sb.outerRadius + 4, sb.leftDipY);
-                ctx.lineTo(sb.leftX - sb.outerRadius + 4, sb.topY);
-                ctx.lineTo(sb.rightX - sb.outerRadius + 4, sb.topY);
-                ctx.lineTo(sb.rightX - sb.outerRadius + 4, sb.rightDipY);
-                ctx.stroke();
-                // 两端多孔塞
-                [
-                    { x: sb.leftX, y: sb.leftDipY },
-                    { x: sb.rightX, y: sb.rightDipY }
-                ].forEach(pos => {
-                    ctx.fillStyle = '#d5c9b0';
-                    ctx.beginPath();
-                    ctx.arc(pos.x, pos.y, sb.outerRadius - 1, 0, Math.PI * 2);
+                if(ion.type === 'cation') {
+                    ctx.fillStyle = "#4285f4";
+                    ctx.arc(ion.x, ion.y, 5, 0, 2*Math.PI);
                     ctx.fill();
-                    ctx.strokeStyle = '#b0a590';
-                    ctx.lineWidth = 2;
-                    ctx.stroke();
-                    // 小孔
-                    for (let i = 0; i < 5; i++) {
-                        const hx = pos.x + (Math.random() - 0.5) * (sb.outerRadius * 1.2);
-                        const hy = pos.y + (Math.random() - 0.5) * (sb.outerRadius * 1.2);
-                        ctx.fillStyle = '#c0b598';
-                        ctx.beginPath();
-                        ctx.arc(hx, hy, 1.2, 0, Math.PI * 2);
-                        ctx.fill();
-                    }
-                });
-                ctx.restore();
-            }
-
-            function drawWireAndBulb(bulbGlow) {
-                ctx.save();
-                // 导线
-                ctx.strokeStyle = '#7a6e5c';
-                ctx.lineWidth = 4.5;
-                ctx.lineCap = 'round';
-                ctx.lineJoin = 'round';
-                ctx.beginPath();
-                ctx.moveTo(wirePath[0].x, wirePath[0].y);
-                for (let i = 1; i < wirePath.length; i++) {
-                    ctx.lineTo(wirePath[i].x, wirePath[i].y);
-                }
-                ctx.stroke();
-                // 导线铜色内芯
-                ctx.strokeStyle = '#c49a6c';
-                ctx.lineWidth = 2.2;
-                ctx.beginPath();
-                ctx.moveTo(wirePath[0].x, wirePath[0].y);
-                for (let i = 1; i < wirePath.length; i++) {
-                    ctx.lineTo(wirePath[i].x, wirePath[i].y);
-                }
-                ctx.stroke();
-
-                // 灯泡底座
-                const bx = bulb.x;
-                const by = bulb.y;
-                ctx.fillStyle = '#5a5a60';
-                ctx.fillRect(bx - 8, by + bulb.radius - 3, 16, 10);
-                ctx.fillStyle = '#777';
-                ctx.fillRect(bx - 10, by + bulb.radius + 7, 20, 5);
-
-                // 灯泡发光
-                if (bulbGlow > 0.1) {
-                    const glowGrad = ctx.createRadialGradient(bx, by, bulb.radius * 0.5, bx, by, bulb.radius * 3);
-                    glowGrad.addColorStop(0, `rgba(255,240,180,${0.9*bulbGlow})`);
-                    glowGrad.addColorStop(0.3, `rgba(255,210,100,${0.6*bulbGlow})`);
-                    glowGrad.addColorStop(0.6, `rgba(255,180,50,${0.25*bulbGlow})`);
-                    glowGrad.addColorStop(1, 'rgba(255,150,20,0)');
-                    ctx.fillStyle = glowGrad;
-                    ctx.beginPath();
-                    ctx.arc(bx, by, bulb.radius * 3, 0, Math.PI * 2);
+                    ctx.fillStyle = "white";
+                    ctx.font = "bold 10px sans-serif";
+                    ctx.fillText("+", ion.x-2, ion.y+3);
+                } else {
+                    ctx.fillStyle = "#ea4335";
+                    ctx.arc(ion.x, ion.y, 5, 0, 2*Math.PI);
                     ctx.fill();
+                    ctx.fillStyle = "white";
+                    ctx.fillText("-", ion.x-2, ion.y+3);
                 }
-
-                // 灯泡玻璃
-                const bulbGrad = ctx.createRadialGradient(bx - 4, by - 5, bulb.radius * 0.2, bx, by, bulb.radius);
-                if (bulbGlow > 0.15) {
-                    bulbGrad.addColorStop(0, '#fffef0');
-                    bulbGrad.addColorStop(0.4, '#ffe8a0');
-                    bulbGrad.addColorStop(0.8, '#e0c070');
-                    bulbGrad.addColorStop(1, '#b09050');
+            }
+        }
+        
+        // 动画更新 (演示)
+        function updateDemoAnimation() {
+            if(!demoPlaying) return;
+            // 更新电子progress
+            let speed = 0.008 * electronSpeedFactor;
+            for(let e of demoElectrons) {
+                e.progress += speed;
+                if(e.progress >= 1) e.progress = 0;
+            }
+            // 更新离子向电极漂移 (阳离子向正极，阴离子向负极)
+            for(let ion of demoIons) {
+                if(ion.type === 'cation') {
+                    let dx = (cathodeX - 10) - ion.x;
+                    let dy = (electrodeY) - ion.y;
+                    let len = Math.hypot(dx,dy);
+                    if(len>3) { ion.x += dx/len * 1.2; ion.y += dy/len * 0.8; }
                 } else {
-                    bulbGrad.addColorStop(0, '#e8e8e8');
-                    bulbGrad.addColorStop(0.5, '#c8c8c8');
-                    bulbGrad.addColorStop(1, '#888');
+                    let dx = (anodeX + 10) - ion.x;
+                    let dy = (electrodeY) - ion.y;
+                    let len = Math.hypot(dx,dy);
+                    if(len>3) { ion.x += dx/len * 1.0; ion.y += dy/len * 0.6; }
                 }
-                ctx.fillStyle = bulbGrad;
-                ctx.beginPath();
-                ctx.arc(bx, by, bulb.radius, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.strokeStyle = 'rgba(0,0,0,0.4)';
-                ctx.lineWidth = 2;
-                ctx.stroke();
-
-                // 灯泡内灯丝
-                ctx.strokeStyle = bulbGlow > 0.15 ? '#ffe8a0' : '#999';
-                ctx.lineWidth = 1.5;
-                ctx.beginPath();
-                ctx.moveTo(bx - 5, by + bulb.radius - 2);
-                ctx.lineTo(bx - 3, by - 3);
-                ctx.lineTo(bx, by + 4);
-                ctx.lineTo(bx + 3, by - 3);
-                ctx.lineTo(bx + 5, by + bulb.radius - 2);
-                ctx.stroke();
-
-                ctx.restore();
+                // 边界重置
+                if(ion.x<anodeX-40 || ion.x>cathodeX+40 || ion.y<electrodeY-60 || ion.y>electrodeY+100) {
+                    ion.x = anodeX + 30 + Math.random() * (cathodeX - anodeX - 60);
+                    ion.y = electrodeY + 20 + Math.random() * 70;
+                }
             }
-
-            function drawLabels(step) {
-                ctx.save();
-                ctx.font = 'bold 14px "PingFang SC","Microsoft YaHei","Segoe UI",sans-serif';
-                ctx.textAlign = 'center';
-
-                // 锌电极标签
-                ctx.fillStyle = '#d0d4dc';
-                ctx.fillText('锌电极 Zn', electrodeZn.x, electrodeZn.topY - 20);
-                if (step >= 1) {
-                    ctx.fillStyle = '#f08050';
-                    ctx.font = 'bold 12px "PingFang SC","Microsoft YaHei","Segoe UI",sans-serif';
-                    ctx.fillText('阳极 (氧化)', electrodeZn.x, electrodeZn.topY - 38);
-                }
-
-                // 铜电极标签
-                ctx.fillStyle = '#d0d4dc';
-                ctx.fillText('铜电极 Cu', electrodeCu.x, electrodeCu.topY - 20);
-                if (step >= 3) {
-                    ctx.fillStyle = '#5cb878';
-                    ctx.font = 'bold 12px "PingFang SC","Microsoft YaHei","Segoe UI",sans-serif';
-                    ctx.fillText('阴极 (还原)', electrodeCu.x, electrodeCu.topY - 38);
-                }
-
-                // 盐桥标签
-                ctx.fillStyle = '#b0b8c0';
-                ctx.font = '12px "PingFang SC","Microsoft YaHei","Segoe UI",sans-serif';
-                ctx.fillText('盐桥 (KCl)', saltBridge.leftX + (saltBridge.rightX - saltBridge.leftX) / 2,
-                    saltBridge.topY - 20);
-
-                // 溶液标签
-                ctx.fillStyle = '#c0c8d0';
-                ctx.font = '11px "PingFang SC","Microsoft YaHei","Segoe UI",sans-serif';
-                ctx.fillText('ZnSO₄ 溶液', beakerL.cx, beakerL.solutionBot + 22);
-                ctx.fillText('CuSO₄ 溶液', beakerR.cx, beakerR.solutionBot + 22);
-
-                // 电子方向箭头(步骤2+)
-                if (step >= 2) {
-                    ctx.fillStyle = '#ffcc00';
-                    ctx.font = 'bold 13px "PingFang SC","Microsoft YaHei","Segoe UI",sans-serif';
-                    const midWireX = (electrodeZn.x + electrodeCu.x) / 2;
-                    ctx.fillText('e⁻ 电子流动方向 →', midWireX, 38);
-                }
-
-                ctx.restore();
+            drawDemoWithHighlight();
+        }
+        
+        function animateDemo() {
+            updateDemoAnimation();
+            demoAnimId = requestAnimationFrame(animateDemo);
+        }
+        
+        // 重置动画状态
+        function resetDemoAnimation() {
+            initDemoParticles();
+            drawDemoWithHighlight();
+        }
+        
+        // 处理分步讲解
+        const stepTexts = [
+            "步骤1: 负极(Zn)失去电子，发生氧化反应：Zn → Zn²⁺ + 2e⁻ (电子流出) ➜ 高亮负极区",
+            "步骤2: 电子沿导线流向正极，产生电流，灯泡发光 ➜ 高亮导线/电子路径",
+            "步骤3: 溶液中阳离子(H⁺或阳离子)向正极移动，获得电子被还原 ➜ 高亮溶液区",
+            "步骤4: 完整闭合回路，离子迁移维持电荷平衡，持续产生电能 ➜ 全局观察"
+        ];
+        const stepHighlights = ["anode", "wire", "solution", null];
+        function setDemoStep(step) {
+            demoStep = Math.min(3, Math.max(0, step));
+            document.getElementById('stepDetail').innerHTML = stepTexts[demoStep];
+            demoHighlight = stepHighlights[demoStep];
+            // 分步讲解时自动暂停
+            if(demoPlaying) {
+                demoPlaying = false;
+                document.getElementById('playPauseDemoBtn').innerHTML = '▶️ 播放';
             }
-
-            function drawDepositOnCu(amount) {
-                if (amount <= 0) return;
-                ctx.save();
-                const cx = electrodeCu.x;
-                const by2 = electrodeCu.botY;
-                const w = electrodeCu.width + amount * 6;
-                // 铜沉积层
-                const dGrad = ctx.createLinearGradient(cx - w / 2, 0, cx + w / 2, 0);
-                dGrad.addColorStop(0, '#b87040');
-                dGrad.addColorStop(0.4, '#e8a060');
-                dGrad.addColorStop(0.6, '#e8a060');
-                dGrad.addColorStop(1, '#b87040');
-                ctx.fillStyle = dGrad;
-                ctx.fillRect(cx - w / 2, by2 - amount * 10, w, amount * 12);
-                ctx.strokeStyle = 'rgba(0,0,0,0.3)';
-                ctx.lineWidth = 1;
-                ctx.strokeRect(cx - w / 2, by2 - amount * 10, w, amount * 12);
-                ctx.restore();
+            drawDemoWithHighlight();
+        }
+        
+        // 重新加载演示配置 (案例/条件改变时)
+        function reloadDemoConfig() {
+            updateDemoParamsByCondition();
+            resetDemoAnimation();
+            setDemoStep(0);
+            // 如果暂停状态更新UI
+            if(!demoPlaying) drawDemoWithHighlight();
+        }
+        
+        // 事件绑定
+        document.getElementById('caseSelect').addEventListener('change', (e)=>{
+            demoType = e.target.value;
+            let extra = document.getElementById('extraOption');
+            if(demoType === 'fruit') {
+                // 水果电池电解质固定为柠檬汁
             }
-
-            function drawZnDissolve(amount) {
-                if (amount <= 0) return;
-                ctx.save();
-                const cx2 = electrodeZn.x;
-                const by3 = electrodeZn.botY;
-                // 溶解凹痕
-                ctx.fillStyle = 'rgba(100,100,110,0.6)';
-                ctx.beginPath();
-                ctx.arc(cx2, by3 - amount * 5, electrodeZn.width / 2 + amount * 2, 0, Math.PI);
-                ctx.fill();
-                ctx.restore();
-            }
-
-            // ============ 主渲染 ============
-            function render(timestamp) {
-                const dt = Math.min(0.1, (timestamp - (render.lastTimestamp || timestamp)) / 1000);
-                render.lastTimestamp = timestamp;
-                globalTime = timestamp;
-
-                updateScale();
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.save();
-                ctx.translate(offsetX, offsetY);
-                ctx.scale(scale, scale);
-
-                // 背景
-                ctx.fillStyle = '#181b21';
-                ctx.fillRect(0, 0, DESIGN_W, DESIGN_H);
-
-                // 桌面
-                ctx.fillStyle = '#252830';
-                ctx.fillRect(0, 420, DESIGN_W, 140);
-                ctx.fillStyle = '#2a2e36';
-                ctx.fillRect(0, 420, DESIGN_W, 4);
-
-                // 计算灯泡发光
-                let bulbGlow = 0;
-                if (currentStep >= 2) {
-                    bulbGlow = 0.5 + 0.5 * Math.sin(globalTime * 0.008);
-                    bulbGlow = Math.max(0.35, bulbGlow);
-                }
-
-                // 计算沉积和溶解量
-                let depositAmount = 0;
-                let dissolveAmount = 0;
-                if (currentStep >= 3) depositAmount = Math.min(1, (currentStep >= 3 ? 0.3 : 0) + (currentStep >= 5 ? 0.5 :
-                    0));
-                if (currentStep >= 1) dissolveAmount = Math.min(0.8, (currentStep >= 1 ? 0.25 : 0) + (currentStep >= 5 ? 0.4 :
-                    0));
-
-                // 绘制烧杯
-                drawBeaker(beakerL.x, beakerL.y, beakerL.w, beakerL.h,
-                    beakerL.solutionTop, beakerL.solutionBot,
-                    'rgba(210,215,220,0.25)', 'ZnSO₄(aq)', beakerL.solutionBot + 22);
-                drawBeaker(beakerR.x, beakerR.y, beakerR.w, beakerR.h,
-                    beakerR.solutionTop, beakerR.solutionBot,
-                    'rgba(70,140,210,0.45)', 'CuSO₄(aq)', beakerR.solutionBot + 22);
-
-                // 绘制盐桥
-                drawSaltBridge();
-
-                // 绘制电极
-                drawElectrode(electrodeZn.x, electrodeZn.botY, electrodeZn.topY,
-                    electrodeZn.width, '#7a7a88', '#b8b8c4');
-                drawElectrode(electrodeCu.x, electrodeCu.botY, electrodeCu.topY,
-                    electrodeCu.width, '#a05530', '#d88050');
-
-                // 溶解和沉积效果
-                drawZnDissolve(dissolveAmount);
-                drawDepositOnCu(depositAmount);
-
-                // 更新和绘制粒子
-                // 电子
-                electrons.forEach(p => {
-                    p.update(dt, currentStep);
-                    if (currentStep >= 2) {
-                        const pos = p.getPosition();
-                        ctx.fillStyle = `rgba(255,210,30,${p.alpha})`;
-                        ctx.shadowColor = 'rgba(255,200,40,0.8)';
-                        ctx.shadowBlur = 6;
-                        ctx.beginPath();
-                        ctx.arc(pos.x, pos.y, p.size, 0, Math.PI * 2);
-                        ctx.fill();
-                        ctx.shadowBlur = 0;
-                    }
+            reloadDemoConfig();
+        });
+        document.getElementById('conditionSelect').addEventListener('change', (e)=>{
+            demoCondition = e.target.value;
+            reloadDemoConfig();
+        });
+        document.getElementById('playPauseDemoBtn').addEventListener('click',()=>{
+            demoPlaying = !demoPlaying;
+            document.getElementById('playPauseDemoBtn').innerHTML = demoPlaying ? '⏸️ 暂停' : '▶️ 播放';
+            if(demoPlaying) drawDemoWithHighlight();
+        });
+        document.getElementById('resetAnimDemoBtn').addEventListener('click',()=>{
+            resetDemoAnimation();
+            if(!demoPlaying) drawDemoWithHighlight();
+        });
+        document.getElementById('stepPrevBtn').addEventListener('click',()=>{
+            setDemoStep(demoStep-1);
+        });
+        document.getElementById('stepNextBtn').addEventListener('click',()=>{
+            setDemoStep(demoStep+1);
+        });
+        
+        // ----------------------------- 组装模块 -----------------------------
+        const assemblyCanvas = document.getElementById('assemblyCanvas');
+        const ctxAsm = assemblyCanvas.getContext('2d');
+        assemblyCanvas.width = 700; assemblyCanvas.height = 380;
+        let asmPlaying = true;
+        let asmElectrons = [];
+        let asmIons = [];
+        let asmVoltage = 0;
+        let asmValid = false;
+        let asmParams = { anode:"Zn", cathode:"Cu", electrolyte:"H2SO4" };
+        let asmAnimId = null;
+        
+        function initAssemblyParticles() {
+            asmElectrons = [];
+            for(let i=0;i<6;i++) asmElectrons.push({ progress: Math.random() });
+            asmIons = [];
+            for(let i=0;i<12;i++) {
+                asmIons.push({
+                    type: Math.random()>0.5 ? 'cation' : 'anion',
+                    x: anodeX + 30 + Math.random() * (cathodeX - anodeX - 60),
+                    y: electrodeY + 30 + Math.random() * 80,
+                    vx:0, vy:0
                 });
-
-                // Zn离子
-                znIons.forEach(p => {
-                    p.update(dt, currentStep);
-                    if (currentStep >= 1) {
-                        const pos = p.getPosition();
-                        if (pos.x > beakerL.x + 5 && pos.x < beakerL.x + beakerL.w - 5 &&
-                            pos.y > beakerL.solutionTop && pos.y < beakerL.solutionBot) {
-                            ctx.fillStyle = `rgba(180,190,210,${p.alpha})`;
-                            ctx.beginPath();
-                            ctx.arc(pos.x, pos.y, p.size, 0, Math.PI * 2);
-                            ctx.fill();
-                            // 小+号
-                            ctx.fillStyle = `rgba(255,255,255,${p.alpha*0.8})`;
-                            ctx.font = `${p.size*2.5}px sans-serif`;
-                            ctx.textAlign = 'center';
-                            ctx.fillText('+', pos.x, pos.y + p.size * 0.7);
-                        }
-                    }
-                });
-
-                // Cu离子
-                cuIons.forEach(p => {
-                    p.update(dt, currentStep);
-                    if (currentStep >= 3) {
-                        const pos = p.getPosition();
-                        if (pos.x > beakerR.x + 5 && pos.x < beakerR.x + beakerR.w - 5 &&
-                            pos.y > beakerR.solutionTop && pos.y < beakerR.solutionBot) {
-                            ctx.fillStyle = `rgba(80,150,220,${p.alpha})`;
-                            ctx.beginPath();
-                            ctx.arc(pos.x, pos.y, p.size, 0, Math.PI * 2);
-                            ctx.fill();
-                            ctx.fillStyle = `rgba(255,255,255,${p.alpha*0.7})`;
-                            ctx.font = `${p.size*2.2}px sans-serif`;
-                            ctx.textAlign = 'center';
-                            ctx.fillText('2+', pos.x, pos.y + p.size * 0.6);
-                        }
-                    }
-                });
-
-                // 盐桥离子
-                const allSaltIons = [...kIons, ...clIons];
-                allSaltIons.forEach(p => {
-                    p.update(dt, currentStep);
-                    if (currentStep >= 4) {
-                        const pos = p.getPosition();
-                        if (p.type === 'k-ion') {
-                            ctx.fillStyle = `rgba(200,140,220,${p.alpha})`;
-                        } else {
-                            ctx.fillStyle = `rgba(140,200,140,${p.alpha})`;
-                        }
-                        ctx.beginPath();
-                        ctx.arc(pos.x, pos.y, p.size, 0, Math.PI * 2);
-                        ctx.fill();
-                    }
-                });
-
-                // 绘制导线和灯泡
-                drawWireAndBulb(bulbGlow);
-
-                // 标签
-                drawLabels(currentStep);
-
-                // 电压显示
-                if (currentStep >= 2) {
-                    ctx.fillStyle = '#f0c060';
-                    ctx.font = 'bold 13px "SF Mono","Consolas","PingFang SC",sans-serif';
-                    ctx.textAlign = 'center';
-                    const voltage = (1.10 * Math.min(1, bulbGlow * 1.6)).toFixed(2);
-                    ctx.fillText(`≈ ${voltage} V`, bulb.x, bulb.y + bulb.radius + 28);
-                }
-
-                ctx.restore();
-                animationId = requestAnimationFrame(render);
             }
-
-            // ============ 步骤控制 ============
-            function setStep(step) {
-                currentStep = Math.max(0, Math.min(TOTAL_STEPS - 1, step));
-                updateUI();
-                // 激活粒子
-                if (currentStep >= 2 && electrons.every(p => p.pathIndex < detailedWirePath.length * 0.01)) {
-                    electrons.forEach((p, i) => { p.pathIndex = (i / electrons.length) * detailedWirePath.length; });
-                }
+        }
+        
+        function calculateAssemblyVoltage() {
+            const {anode, cathode, electrolyte} = asmParams;
+            let activity = 0;
+            if(electrolyte === "H2SO4" || electrolyte === "lemon") activity = 1;
+            else activity = 0.3;
+            let metalDiff = 0;
+            const metalOrder = {"Mg":1.6, "Al":1.3, "Zn":1.0, "Cu":0.2, "C":0.1, "Ag":0.3};
+            let anodeAct = metalOrder[anode] || 0.8;
+            let cathodeAct = metalOrder[cathode] || 0.2;
+            if(anodeAct > cathodeAct && activity>0.2) {
+                let volt = (anodeAct - cathodeAct) * 0.9 * activity;
+                volt = Math.min(1.8, Math.max(0.2, volt));
+                return {valid:true, voltage:Math.round(volt*100)/100};
+            } else {
+                return {valid:false, voltage:0};
             }
-
-            function updateUI() {
-                const data = stepData[currentStep];
-                stepIcon.textContent = data.icon;
-                stepTitle.textContent = data.title;
-                stepDesc.textContent = data.desc;
-                equationDisplay.innerHTML = data.eq;
-
-                // 步骤点
-                const dots = stepDotsContainer.querySelectorAll('.step-dot');
-                dots.forEach((dot, i) => {
-                    dot.classList.remove('active', 'done');
-                    if (i === currentStep) dot.classList.add('active');
-                    if (i < currentStep) dot.classList.add('done');
-                });
-
-                // 按钮状态
-                btnPrev.disabled = currentStep === 0;
-                btnNext.disabled = currentStep === TOTAL_STEPS - 1;
-
-                // 播放按钮
-                if (isAutoPlaying && currentStep >= TOTAL_STEPS - 1) {
-                    stopAutoPlay();
-                }
-                if (isAutoPlaying) {
-                    btnPlay.textContent = '⏸ 暂停';
-                    btnPlay.classList.add('primary');
+        }
+        
+        function drawAssemblyWithParticles() {
+            const {anode,cathode,electrolyte} = asmParams;
+            let elecName = electrolyte==="H2SO4"?"稀H₂SO₄":(electrolyte==="lemon"?"柠檬汁":"食盐水");
+            drawBattery(ctxAsm, canvasW, canvasH, anode, cathode, elecName, asmVoltage, null);
+            drawParticles(ctxAsm, asmElectrons, asmIons, anodeX, cathodeX, electrodeY);
+        }
+        
+        function updateAssemblyAnimation() {
+            if(!asmPlaying || !asmValid) return;
+            let speed = 0.008 * (asmVoltage/1.1);
+            for(let e of asmElectrons) {
+                e.progress += speed;
+                if(e.progress>=1) e.progress=0;
+            }
+            for(let ion of asmIons) {
+                if(ion.type === 'cation') {
+                    let dx = (cathodeX - 10) - ion.x, dy = (electrodeY) - ion.y;
+                    let len = Math.hypot(dx,dy);
+                    if(len>3) { ion.x += dx/len * 1.2; ion.y += dy/len * 0.8; }
                 } else {
-                    btnPlay.textContent = '▶ 自动演示';
-                    btnPlay.classList.remove('primary');
+                    let dx = (anodeX + 10) - ion.x, dy = (electrodeY) - ion.y;
+                    let len = Math.hypot(dx,dy);
+                    if(len>3) { ion.x += dx/len * 1.0; ion.y += dy/len * 0.6; }
+                }
+                if(ion.x<anodeX-40 || ion.x>cathodeX+40 || ion.y<electrodeY-60 || ion.y>electrodeY+100) {
+                    ion.x = anodeX + 30 + Math.random() * (cathodeX - anodeX - 60);
+                    ion.y = electrodeY + 20 + Math.random() * 70;
                 }
             }
-
-            function stopAutoPlay() {
-                isAutoPlaying = false;
-                if (autoPlayTimer) clearInterval(autoPlayTimer);
-                autoPlayTimer = null;
-                updateUI();
+            drawAssemblyWithParticles();
+        }
+        
+        function asmAnimationLoop() {
+            updateAssemblyAnimation();
+            asmAnimId = requestAnimationFrame(asmAnimationLoop);
+        }
+        
+        function assembleBattery() {
+            const anode = document.getElementById('anodeSelect').value;
+            const cathode = document.getElementById('cathodeSelect').value;
+            const electrolyte = document.getElementById('electrolyteSelect').value;
+            asmParams = {anode, cathode, electrolyte};
+            const result = calculateAssemblyVoltage();
+            asmValid = result.valid;
+            asmVoltage = result.voltage;
+            document.getElementById('assemblyVoltage').innerHTML = `电压: ${asmValid ? asmVoltage+" V" : "无效组合 ❌ 无法形成原电池"}`;
+            let feedbackMsg = asmValid ? `✅ 成功组装！ ${anode} 更活泼，电子流出，形成电流，电压 ${asmVoltage} V` : `❌ 无法形成原电池：负极活泼性需大于正极且电解质需提供离子迁移。尝试镁/铜+酸性液。`;
+            document.getElementById('assemblyFeedback').innerHTML = `🔍 ${feedbackMsg}`;
+            initAssemblyParticles();
+            if(!asmPlaying) {
+                drawAssemblyWithParticles();
             }
-
-            function startAutoPlay() {
-                if (currentStep >= TOTAL_STEPS - 1) {
-                    setStep(0);
-                }
-                isAutoPlaying = true;
-                updateUI();
-                autoPlayTimer = setInterval(() => {
-                    if (currentStep < TOTAL_STEPS - 1) {
-                        setStep(currentStep + 1);
-                    } else {
-                        stopAutoPlay();
-                    }
-                }, 2800 / animationSpeed);
-            }
-
-            function toggleAutoPlay() {
-                if (isAutoPlaying) {
-                    stopAutoPlay();
-                } else {
-                    startAutoPlay();
-                }
-            }
-
-            // ============ 事件监听 ============
-            btnPrev.addEventListener('click', () => {
-                stopAutoPlay();
-                setStep(currentStep - 1);
-            });
-            btnNext.addEventListener('click', () => {
-                stopAutoPlay();
-                setStep(currentStep + 1);
-            });
-            btnPlay.addEventListener('click', toggleAutoPlay);
-            btnReset.addEventListener('click', () => {
-                stopAutoPlay();
-                setStep(0);
-                initParticles();
-                updateUI();
-            });
-            speedSlider.addEventListener('input', () => {
-                animationSpeed = parseFloat(speedSlider.value);
-                if (isAutoPlaying && autoPlayTimer) {
-                    clearInterval(autoPlayTimer);
-                    autoPlayTimer = setInterval(() => {
-                        if (currentStep < TOTAL_STEPS - 1) {
-                            setStep(currentStep + 1);
-                        } else {
-                            stopAutoPlay();
-                        }
-                    }, 2800 / animationSpeed);
-                }
-            });
-
-            // 步骤点点击
-            function createStepDots() {
-                stepDotsContainer.innerHTML = '';
-                for (let i = 0; i < TOTAL_STEPS; i++) {
-                    const dot = document.createElement('span');
-                    dot.className = 'step-dot';
-                    if (i === currentStep) dot.classList.add('active');
-                    if (i < currentStep) dot.classList.add('done');
-                    dot.title = stepData[i].title;
-                    dot.addEventListener('click', () => {
-                        stopAutoPlay();
-                        setStep(i);
-                    });
-                    stepDotsContainer.appendChild(dot);
-                }
-            }
-
-            // 键盘控制
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'ArrowRight' || e.key === ' ') {
-                    e.preventDefault();
-                    stopAutoPlay();
-                    if (currentStep < TOTAL_STEPS - 1) setStep(currentStep + 1);
-                } else if (e.key === 'ArrowLeft') {
-                    e.preventDefault();
-                    stopAutoPlay();
-                    if (currentStep > 0) setStep(currentStep - 1);
-                } else if (e.key === 'p' || e.key === 'P') {
-                    e.preventDefault();
-                    toggleAutoPlay();
-                } else if (e.key === 'r' || e.key === 'R') {
-                    e.preventDefault();
-                    stopAutoPlay();
-                    setStep(0);
-                    initParticles();
-                    updateUI();
-                }
-            });
-
-            // Canvas点击也可以推进步骤
-            canvas.addEventListener('click', (e) => {
-                const rect = canvas.getBoundingClientRect();
-                const cx = e.clientX - rect.left;
-                const cy = e.clientY - rect.top;
-                // 点击右侧区域推进，左侧后退
-                if (cx > rect.width * 0.55) {
-                    stopAutoPlay();
-                    if (currentStep < TOTAL_STEPS - 1) setStep(currentStep + 1);
-                } else if (cx < rect.width * 0.25) {
-                    stopAutoPlay();
-                    if (currentStep > 0) setStep(currentStep - 1);
-                }
-            });
-
-            // 响应式
-            window.addEventListener('resize', resizeCanvas);
-            const resizeObserver = new ResizeObserver(() => {
-                resizeCanvas();
-            });
-            resizeObserver.observe(canvasWrap);
-
-            // ============ 初始化 ============
-            function init() {
-                resizeCanvas();
-                initParticles();
-                createStepDots();
-                setStep(0);
-                updateUI();
-                render.lastTimestamp = performance.now();
-                animationId = requestAnimationFrame(render);
-            }
-
-            init();
-
-            // 清理
-            window.addEventListener('beforeunload', () => {
-                if (animationId) cancelAnimationFrame(animationId);
-                if (autoPlayTimer) clearInterval(autoPlayTimer);
-                resizeObserver.disconnect();
-            });
-
-            console.log('⚡ 原电池原理交互演示已就绪');
-            console.log('   🖱 点击画布右侧 → 下一步');
-            console.log('   🖱 点击画布左侧 → 上一步');
-            console.log('   ⌨ 键盘 ← → 切换步骤');
-            console.log('   ⌨ 按 P 自动播放/暂停');
-            console.log('   ⌨ 按 R 重置');
-        })();
-    </script>
+        }
+        
+        document.getElementById('assembleBtn').addEventListener('click',()=>{
+            assembleBattery();
+        });
+        document.getElementById('pauseAssemblyBtn').addEventListener('click',()=>{
+            asmPlaying = !asmPlaying;
+            document.getElementById('pauseAssemblyBtn').innerHTML = asmPlaying ? "⏸️ 暂停" : "▶️ 播放";
+            if(asmPlaying) drawAssemblyWithParticles();
+        });
+        
+        // 初始化所有
+        function init() {
+            initDemoParticles();
+            updateDemoParamsByCondition();
+            setDemoStep(0);
+            animateDemo();
+            assembleBattery(); // 默认组装一个有效电池
+            asmAnimationLoop();
+        }
+        init();
+    })();
+</script>
 </body>
 </html>
