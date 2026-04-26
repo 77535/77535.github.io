@@ -3,9 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>原电池学习中心 | 真题特训·仿真实验·AI答疑</title>
-    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <title>原电池学习中心 | 真题特训·仿真实验·AI答疑·智能题库</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js">
+    </script>
     <style>
+        :root {
+            --sw-primary: #4f46e5;
+            --sw-primary-dark: #3a0ca3;
+            --sw-bg: #f1f5f9;
+            --sw-card: #fff;
+            --sw-text: #0f172a;
+            --sw-border: #eef2ff;
+            --sw-radius: 28px;
+            --sw-radius-sm: 20px;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -15,36 +27,35 @@
 
         body {
             background: #f1f5f9;
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', sans-serif;
             padding: 24px 16px 48px 16px;
             color: #0f172a;
+            min-height: 100vh;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 820px;
             margin: 0 auto;
         }
 
+        /* Hero */
         .hero {
             background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
             border-radius: 32px;
             padding: 28px 20px;
             margin-bottom: 24px;
-            color: white;
+            color: #fff;
             box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.3);
         }
-
         .hero h1 {
             font-size: 1.85rem;
             font-weight: 700;
             margin-bottom: 8px;
         }
-
         .hero p {
             font-size: 0.95rem;
             opacity: 0.9;
         }
-
         .badge-tip {
             background: rgba(255, 255, 240, 0.2);
             display: inline-block;
@@ -54,15 +65,15 @@
             margin-top: 12px;
         }
 
+        /* Category Card */
         .category-card {
-            background: white;
+            background: #fff;
             border-radius: 28px;
             padding: 20px 18px;
             margin-bottom: 24px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
             border: 1px solid rgba(226, 232, 240, 0.6);
         }
-
         .category-title {
             display: flex;
             align-items: center;
@@ -71,7 +82,6 @@
             padding-bottom: 12px;
             border-bottom: 2px solid #eef2ff;
         }
-
         .category-icon {
             font-size: 2rem;
             background: #f8fafc;
@@ -81,20 +91,18 @@
             align-items: center;
             justify-content: center;
             border-radius: 30px;
+            flex-shrink: 0;
         }
-
         .category-title h2 {
-            font-size: 1.55rem;
+            font-size: 1.45rem;
             font-weight: 640;
             color: #1e293b;
         }
-
         .items-list {
             display: flex;
             flex-direction: column;
             gap: 14px;
         }
-
         .resource-item {
             background: #fefefe;
             border-radius: 20px;
@@ -105,45 +113,84 @@
             border: 1px solid #eef2ff;
             text-decoration: none;
             color: inherit;
-            transition: 0.1s;
+            transition: 0.15s;
             cursor: pointer;
         }
-
         .resource-item:active {
             background-color: #f1f5f9;
             transform: scale(0.98);
         }
-
         .item-icon {
             font-size: 1.8rem;
             min-width: 44px;
             text-align: center;
         }
-
         .item-content {
             flex: 1;
         }
-
         .item-name {
             font-weight: 600;
             font-size: 1.05rem;
             margin-bottom: 4px;
         }
-
         .item-desc {
             font-size: 0.75rem;
             color: #5b6e8c;
         }
-
         .arrow-icon {
             color: #94a3b8;
             font-size: 1.2rem;
         }
 
+        /* 希沃 */
+        .seewo-iframe-wrapper {
+            position: relative;
+            width: 100%;
+            background: #f8fafc;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 2px solid #e2e8f0;
+            margin-bottom: 14px;
+        }
+        .seewo-iframe-wrapper iframe {
+            width: 100%;
+            height: 520px;
+            border: none;
+            display: block;
+            background: #fff;
+        }
+        .seewo-fullscreen-btn {
+            position: absolute;
+            top: 10px;
+            right: 16px;
+            background: rgba(0, 0, 0, 0.55);
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            z-index: 5;
+        }
+        .seewo-open-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #f59e0b;
+            color: #1e293b;
+            border: none;
+            border-radius: 44px;
+            padding: 12px 24px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        /* Flashcard 真题特训 */
         .flashcard-container {
             margin-top: 8px;
         }
-
         .quiz-header {
             display: flex;
             justify-content: space-between;
@@ -154,33 +201,28 @@
             border-radius: 40px;
             margin-bottom: 16px;
         }
-
-        .badge {
+        .b2adge {
             background: #4f46e5;
-            color: white;
+            color: #fff;
             padding: 4px 14px;
             border-radius: 30px;
             font-size: 0.8rem;
         }
-
         .progress {
             font-weight: 500;
-            background: white;
+            background: #fff;
             padding: 4px 12px;
             border-radius: 30px;
         }
-
         .question-card {
-            background: white;
+            background: #fff;
             border-radius: 28px;
             overflow: hidden;
             border: 1px solid #eef2ff;
         }
-
         .question-body {
             padding: 24px 24px 16px;
         }
-
         .q-title {
             background: #f1f5f9;
             display: inline-block;
@@ -190,71 +232,69 @@
             font-size: 0.85rem;
             font-weight: 600;
         }
-
         .question-text {
             font-weight: 500;
             margin-bottom: 20px;
             line-height: 1.45;
         }
-
-        .option-item {
+        .option-itm {
             padding: 8px 0;
             display: flex;
             gap: 10px;
             border-bottom: 1px solid #f1f5f9;
         }
-
         .option-prefix {
             font-weight: 700;
             min-width: 28px;
         }
-
         .action-buttons {
             display: flex;
             gap: 12px;
             padding: 0 24px 24px 24px;
         }
-
-        .btn-outline, .btn-primary, .btn-prev {
+        .btn-outline2,
+        .btn-primary2,
+        .btn-prev2 {
             flex: 1;
             border-radius: 60px;
             padding: 10px 0;
             font-weight: 600;
             cursor: pointer;
-            transition: 0.1s;
+            transition: 0.15s;
             text-align: center;
+            font-family: inherit;
+            font-size: 0.9rem;
         }
-        .btn-outline {
-            background: white;
+        .btn-outline2 {
+            background: #fff;
             border: 1px solid #cbd5e1;
         }
-        .btn-primary {
+        .btn-primary2 {
             background: #4f46e5;
-            color: white;
+            color: #fff;
             border: none;
         }
-        .btn-prev {
+        .btn-prev2 {
             background: #f1f5f9;
             border: 1px solid #ddd;
         }
-        .btn-primary:active, .btn-outline:active, .btn-prev:active {
+        .btn-outline2:active,
+        .btn-primary2:active,
+        .btn-prev2:active {
             transform: scale(0.97);
         }
-
         .answer-section {
             background: #f8fafc;
             border-top: 1px solid #eef2ff;
             padding: 18px 24px;
             display: none;
         }
-
         .answer-title {
             font-weight: 700;
             margin-bottom: 8px;
         }
-
         .answer-detail {
-            background: white;
+            background: #fff;
             border-radius: 20px;
             padding: 16px;
             border: 1px solid #e2e8f0;
@@ -268,6 +308,8 @@
             border-radius: 16px;
             margin: 8px 0;
         }
+
+        /* AI */
         .assistant-card {
             background: #f8fafc;
             border: 1px solid #dbeafe;
@@ -276,7 +318,7 @@
             box-shadow: 0 8px 18px rgba(99, 102, 241, 0.08);
         }
         .assistant-chat {
-            background: white;
+            background: #fff;
             border: 1px solid #e2e8f0;
             border-radius: 18px;
             min-height: 220px;
@@ -303,7 +345,7 @@
         }
         .assistant-message.assistant {
             background: #4f46e5;
-            color: white;
+            color: #fff;
             align-self: flex-start;
             border-bottom-left-radius: 6px;
         }
@@ -320,75 +362,30 @@
             padding: 12px 16px;
             font-size: 0.95rem;
             outline: none;
+            font-family: inherit;
         }
         .assistant-input-row input:focus {
             border-color: #7c3aed;
         }
         .assistant-input-row button {
             background: #4f46e5;
-            color: white;
+            color: #fff;
             border: none;
             border-radius: 999px;
             padding: 12px 20px;
             font-weight: 700;
             cursor: pointer;
+            font-family: inherit;
         }
-        .seewo-iframe-wrapper {
-            position: relative;
-            width: 100%;
-            background: #f8fafc;
-            border-radius: 20px;
-            overflow: hidden;
-            border: 2px solid #e2e8f0;
-            margin-bottom: 14px;
-        }
-        .seewo-iframe-wrapper iframe {
-            width: 100%;
-            height: 520px;
-            border: none;
-            display: block;
-            background: #fff;
-        }
-        .seewo-fullscreen-btn {
-            position: absolute;
-            top: 10px;
-            right: 16px;
-            background: rgba(0,0,0,0.55);
-            color: white;
-            border: none;
-            border-radius: 20px;
-            padding: 6px 14px;
-            font-size: 0.75rem;
-            cursor: pointer;
-            z-index: 5;
-        }
-        .seewo-open-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: #f59e0b;
-            color: #1e293b;
-            border: none;
-            border-radius: 44px;
-            padding: 12px 24px;
-            font-weight: 700;
-            font-size: 0.95rem;
-            cursor: pointer;
-            text-decoration: none;
-        }
-        .footer-info {
-            text-align: center;
-            margin-top: 28px;
-            font-size: 0.7rem;
-            color: #7e8b9e;
-        }
+
+        /* Toast */
         .toast-msg {
             position: fixed;
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
             background: #1e293b;
-            color: white;
+            color: #fff;
             padding: 10px 18px;
             border-radius: 50px;
             font-size: 0.85rem;
@@ -397,210 +394,745 @@
             pointer-events: none;
             z-index: 1000;
         }
-        .toast-msg.show { opacity: 1; }
+        .toast-msg.show {
+            opacity: 1;
+        }
+        .footer-info {
+            text-align: center;
+            margin-top: 28px;
+            font-size: 0.7rem;
+            color: #7e8b9e;
+        }
+
+        /* ========== 智能题库模块样式（隔离在 #smartQuizWrapper 内） ========== */
+        #smartQuizWrapper {
+            font-family: system-ui, -apple-system, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        #smartQuizWrapper .sq-tab-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eef2ff;
+            padding-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        #smartQuizWrapper .sq-tab {
+            padding: 10px 18px;
+            cursor: pointer;
+            border-radius: 25px;
+            background: #f7f9fc;
+            transition: all 0.25s ease;
+            font-weight: 600;
+            font-size: 0.88rem;
+            border: 1px solid transparent;
+            color: #475569;
+            font-family: inherit;
+        }
+        #smartQuizWrapper .sq-tab.sq-active {
+            background: linear-gradient(135deg, #4f46e5, #3a0ca3);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
+            border-color: transparent;
+        }
+        #smartQuizWrapper .sq-tab:hover {
+            background: #eef2ff;
+            border-color: #cbd5e1;
+        }
+        #smartQuizWrapper .sq-tab.sq-active:hover {
+            background: linear-gradient(135deg, #4f46e5, #3a0ca3);
+            border-color: transparent;
+        }
+        #smartQuizWrapper .sq-page {
+            display: none;
+        }
+        #smartQuizWrapper .sq-page.sq-show {
+            display: block;
+            animation: sqFadeIn 0.35s ease;
+        }
+        @keyframes sqFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        #smartQuizWrapper .sq-question-box {
+            margin: 20px 0;
+            padding: 22px 20px;
+            background: #f8fafc;
+            border-radius: 16px;
+            border-left: 4px solid #4f46e5;
+        }
+        #smartQuizWrapper .sq-q-title {
+            font-size: 1.05rem;
+            margin-bottom: 16px;
+            line-height: 1.6;
+            color: #1e293b;
+            font-weight: 600;
+        }
+        #smartQuizWrapper .sq-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        #smartQuizWrapper .sq-option {
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #fff;
+            font-size: 0.93rem;
+            font-weight: 500;
+            color: #334155;
+        }
+        #smartQuizWrapper .sq-option:hover {
+            background: #eef2ff;
+            border-color: #4f46e5;
+            transform: translateX(3px);
+        }
+        #smartQuizWrapper .sq-option.sq-selected {
+            background: linear-gradient(90deg, #eef2ff, #dbeafe);
+            border-color: #4f46e5;
+            font-weight: 600;
+        }
+        #smartQuizWrapper .sq-btn {
+            padding: 11px 22px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #4f46e5, #3a0ca3);
+            color: #fff;
+            cursor: pointer;
+            margin-top: 16px;
+            font-size: 0.9rem;
+            transition: all 0.25s;
+            font-weight: 600;
+            font-family: inherit;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+        }
+        #smartQuizWrapper .sq-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(79, 70, 229, 0.35);
+        }
+        #smartQuizWrapper .sq-btn:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        #smartQuizWrapper .sq-btn-secondary {
+            background: #fff;
+            color: #4f46e5;
+            border: 2px solid #4f46e5;
+            box-shadow: none;
+            font-weight: 600;
+        }
+        #smartQuizWrapper .sq-btn-secondary:hover {
+            background: #eef2ff;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15);
+        }
+        #smartQuizWrapper .sq-result {
+            margin-top: 14px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 10px 14px;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        #smartQuizWrapper .sq-correct {
+            color: #059669;
+            background: #f0fdf4;
+            border-left: 3px solid #10b981;
+        }
+        #smartQuizWrapper .sq-wrong {
+            color: #dc2626;
+            background: #fef2f2;
+            border-left: 3px solid #ef4444;
+        }
+        #smartQuizWrapper .sq-wrong-list {
+            margin-top: 16px;
+        }
+        #smartQuizWrapper .sq-wrong-item {
+            padding: 14px 16px;
+            border-left: 4px solid #ef4444;
+            background: #fef2f2;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            line-height: 1.5;
+            font-size: 0.88rem;
+        }
+        #smartQuizWrapper .sq-empty-tip {
+            color: #94a3b8;
+            text-align: center;
+            padding: 30px 20px;
+            font-size: 0.9rem;
+        }
+        #smartQuizWrapper .sq-stats {
+            margin: 14px 0;
+            color: #475569;
+            font-size: 0.85rem;
+            padding: 8px 14px;
+            background: #f8fafc;
+            border-radius: 20px;
+            display: inline-block;
+            font-weight: 500;
+        }
+        #smartQuizWrapper h3 {
+            font-size: 1.1rem;
+            color: #1e293b;
+            margin-bottom: 12px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #e2e8f0;
+            display: inline-block;
+        }
+
         @media (max-width: 550px) {
-            .seewo-iframe-wrapper iframe { height: 350px; }
-            .action-buttons { flex-wrap: wrap; }
+            .seewo-iframe-wrapper iframe {
+                height: 350px;
+            }
+            .action-buttons {
+                flex-wrap: wrap;
+            }
+            #smartQuizWrapper .sq-tab {
+                padding: 8px 12px;
+                font-size: 0.78rem;
+            }
+            #smartQuizWrapper .sq-question-box {
+                padding: 16px 12px;
+            }
+            #smartQuizWrapper .sq-option {
+                padding: 10px 12px;
+                font-size: 0.85rem;
+            }
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="hero">
-        <h1>⚡ 原电池专题学习站</h1>
-        <p>真题特训 · 仿真实验 · 希沃互动课件 · AI智能问答</p>
-        <div class="badge-tip">🔬 高考真题全覆盖 & 极致解析 | 含近十年30道精选母题</div>
-    </div>
-
-    <!-- 课堂检测模块 -->
-    <div class="category-card">
-        <div class="category-title">
-            <div class="category-icon">📋</div>
-            <h2>课堂检测</h2>
+    <div class="container">
+        <!-- Hero -->
+        <div class="hero">
+            <h1>⚡ 原电池专题学习站</h1>
+            <p>真题特训 · 仿真实验 · 希沃互动课件 · AI智能问答 · 智能题库</p>
+            <div class="badge-tip">🔬 高考真题全覆盖 & 极致解析 | 含近十年30道精选母题 + 30题智能特训</div>
         </div>
-        <div class="items-list">
-            <a class="resource-item" href="https://v.wjx.cn/vm/mibRXVf.aspx" target="_blank" rel="noopener noreferrer">
-                <div class="item-icon">📝</div>
-                <div class="item-content">
-                    <div class="item-name">化学"原电池"课堂检测</div>
-                    <div class="item-desc">匿名问卷，帮助改进教学</div>
+
+        <!-- 课堂检测 -->
+        <div class="category-card">
+            <div class="category-title">
+                <div class="category-icon">📋</div>
+                <h2>课堂检测</h2>
+            </div>
+            <div class="items-list">
+                <a class="resource-item" href="https://v.wjx.cn/vm/mibRXVf.aspx" target="_blank" rel="noopener noreferrer">
+                    <div class="item-icon">📝</div>
+                    <div class="item-content">
+                        <div class="item-name">化学"原电池"课堂检测</div>
+                        <div class="item-desc">匿名问卷，帮助改进教学</div>
+                    </div>
+                    <div class="arrow-icon">→</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- 希沃白板 -->
+        <div class="category-card" style="border-color:#fcd34d;background:#fffdf7;">
+            <div class="category-title" style="border-bottom-color:#fef3c7;">
+                <div class="category-icon" style="background:#fff7ed;">📺</div>
+                <h2>希沃白板 · 互动课件</h2>
+            </div>
+            <div class="seewo-iframe-wrapper" id="seewoWrapper">
+                <button class="seewo-fullscreen-btn" id="seewoFullscreenBtn">🔗 全屏打开</button>
+                <iframe id="seewoIframe" src="https://13.r302.cc/lw8BK3D?platform=enpc&channel=copylink" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy" title="希沃白板·原电池互动课件"></iframe>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+                <a class="seewo-open-btn" href="https://13.r302.cc/lw8BK3D?platform=enpc&channel=copylink" target="_blank" rel="noopener noreferrer">🖥️ 在新标签页中打开课件</a>
+                <span style="font-size:0.7rem;color:#78716c;">💡 如预览异常请点击左侧按钮直接访问</span>
+            </div>
+        </div>
+
+        <!-- 虚拟仿真实验 -->
+        <div class="category-card">
+            <div class="category-title">
+                <div class="category-icon">🎮</div>
+                <h2>虚拟仿真实验</h2>
+            </div>
+            <div class="items-list">
+                <a class="resource-item" href="exp_basic.html" target="_blank"><div class="item-icon">⚡</div><div class="item-content"><div class="item-name">基础原电池模拟（导线直连）</div><div class="item-desc">锌片溶解 + 铜片气泡</div></div><div class="arrow-icon">→</div></a>
+                <a class="resource-item" href="exp_ammeter.html" target="_blank"><div class="item-icon">🔄</div><div class="item-content"><div class="item-name">原电池实验（带电流表）</div><div class="item-desc">指针摆动，电子流动可视化</div></div><div class="arrow-icon">→</div></a>
+                <a class="resource-item" href="exp_principle.html" target="_blank"><div class="item-icon">🎬</div><div class="item-content"><div class="item-name">原电池原理交互讲解</div><div class="item-desc">分步动画 + 氧化还原演示</div></div><div class="arrow-icon">→</div></a>
+            </div>
+            <div style="font-size:0.7rem;color:#5b6e8c;margin-top:12px;text-align:center;">💡 点击实验名称，在新页面中运行交互式仿真动画</div>
+        </div>
+
+        <!-- AI智能问答 -->
+        <div class="category-card">
+            <div class="category-title">
+                <div class="category-icon">🤖</div>
+                <h2>化学原电池 AI 智能问答助手</h2>
+            </div>
+            <div class="assistant-card">
+                <div class="assistant-chat" id="assistantChatBody">
+                    <div class="assistant-message assistant">你好，我是原电池智能助手。输入你的问题（电极反应、电子流向、盐桥作用等），我会给出细致解答。</div>
                 </div>
-                <div class="arrow-icon">→</div>
-            </a>
-        </div>
-    </div>
-
-    <!-- 希沃白板课件模块 -->
-    <div class="category-card" style="border-color: #fcd34d; background: #fffdf7;">
-        <div class="category-title" style="border-bottom-color: #fef3c7;">
-            <div class="category-icon" style="background: #fff7ed;">📺</div>
-            <h2>希沃白板 · 互动课件</h2>
-        </div>
-        <div class="seewo-iframe-wrapper" id="seewoWrapper">
-            <button class="seewo-fullscreen-btn" id="seewoFullscreenBtn">🔗 全屏打开</button>
-            <iframe id="seewoIframe" src="https://13.r302.cc/lw8BK3D?platform=enpc&channel=copylink" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy" title="希沃白板·原电池互动课件"></iframe>
-        </div>
-        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-            <a class="seewo-open-btn" href="https://13.r302.cc/lw8BK3D?platform=enpc&channel=copylink" target="_blank" rel="noopener noreferrer">🖥️ 在新标签页中打开课件</a>
-            <span style="font-size:0.7rem; color:#78716c;">💡 如预览异常请点击左侧按钮直接访问</span>
-        </div>
-    </div>
-
-    <!-- 虚拟仿真实验 -->
-    <div class="category-card">
-        <div class="category-title">
-            <div class="category-icon">🎮</div>
-            <h2>虚拟仿真实验</h2>
-        </div>
-        <div class="items-list">
-            <a class="resource-item" href="exp_basic.html" target="_blank"><div class="item-icon">⚡</div><div class="item-content"><div class="item-name">基础原电池模拟（导线直连）</div><div class="item-desc">锌片溶解 + 铜片气泡</div></div><div class="arrow-icon">→</div></a>
-            <a class="resource-item" href="exp_ammeter.html" target="_blank"><div class="item-icon">🔄</div><div class="item-content"><div class="item-name">原电池实验（带电流表）</div><div class="item-desc">指针摆动，电子流动可视化</div></div><div class="arrow-icon">→</div></a>
-            <a class="resource-item" href="exp_principle.html" target="_blank"><div class="item-icon">🎬</div><div class="item-content"><div class="item-name">原电池原理交互讲解</div><div class="item-desc">分步动画 + 氧化还原演示</div></div><div class="arrow-icon">→</div></a>
-        </div>
-        <div style="font-size:0.7rem; color:#5b6e8c; margin-top:12px; text-align:center;">💡 点击实验名称，在新页面中运行交互式仿真动画</div>
-    </div>
-
-    <!-- AI 智能问答助手 -->
-    <div class="category-card">
-        <div class="category-title">
-            <div class="category-icon">🤖</div>
-            <h2>化学原电池 AI 智能问答助手</h2>
-        </div>
-        <div class="assistant-card">
-            <div class="assistant-chat" id="assistantChatBody">
-                <div class="assistant-message assistant">你好，我是原电池智能助手。输入你的问题（电极反应、电子流向、盐桥作用等），我会给出细致解答。</div>
-            </div>
-            <div class="assistant-input-row">
-                <input id="assistantInput" type="text" placeholder="例如：为什么锌铜原电池中电子从锌流向铜？">
-                <button id="assistantSendBtn">提问</button>
+                <div class="assistant-input-row">
+                    <input id="assistantInput" type="text" placeholder="例如：为什么锌铜原电池中电子从锌流向铜？">
+                    <button id="assistantSendBtn">提问</button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- ★ 高考真题 · 专题特训（合并全部真题 + 极致解析）★ -->
-    <div class="category-card">
-        <div class="category-title">
-            <div class="category-icon">📖</div>
-            <h2>高考真题 · 专题特训</h2>
+        <!-- 高考真题·专题特训（flashcard） -->
+        <div class="category-card">
+            <div class="category-title">
+                <div class="category-icon">📖</div>
+                <h2>高考真题 · 专题特训（30道精编·极致解析）</h2>
+            </div>
+            <div id="quizRoot"></div>
+            <div style="font-size:0.75rem;margin-top:12px;text-align:center;color:#475569;">✅ 收录近十年高考经典真题及变式，每道题均附详细破题思路与深度解析</div>
         </div>
-        <div id="quizRoot"></div>
-        <div style="font-size:0.75rem; margin-top:12px; text-align:center; color:#475569;">✅ 收录近十年高考经典真题及变式，每道题均附详细破题思路与深度解析</div>
+
+        <!-- ★ 30题智能题库·错题特训（新增模块）★ -->
+        <div class="category-card" id="smartQuizWrapper" style="border-color:#dbeafe;background:#fff;">
+            <div class="category-title" style="border-bottom-color:#dbeafe;">
+                <div class="category-icon" style="background:#eef2ff;">📚</div>
+                <h2>30题智能题库 · 错题特训 · 举一反三</h2>
+            </div>
+            <div class="sq-tab-box">
+                <button class="sq-tab sq-active" data-target="sq-practice">刷题练习</button>
+                <button class="sq-tab" data-target="sq-wrongbook">错题本</button>
+                <button class="sq-tab" data-target="sq-practice-wrong">错题重练</button>
+                <button class="sq-tab" data-target="sq-similar">举一反三</button>
+            </div>
+            <div class="sq-page sq-show" id="sq-practice">
+                <div class="sq-stats">总题数：<span id="sq-total-q">0</span> | 当前题号：<span id="sq-current-num">0</span></div>
+                <div class="sq-question-box" id="sq-practice-box"></div>
+                <button class="sq-btn" id="sq-next-practice">下一题</button>
+            </div>
+            <div class="sq-page" id="sq-wrongbook">
+                <h3>📕 错题本（自动收录）</h3>
+                <div class="sq-wrong-list" id="sq-wrong-list"></div>
+                <button class="sq-btn sq-btn-secondary" id="sq-clear-wrong">清空错题</button>
+            </div>
+            <div class="sq-page" id="sq-practice-wrong">
+                <div class="sq-stats">错题总数：<span id="sq-wrong-count">0</span></div>
+                <div class="sq-question-box" id="sq-wrong-practice-box"></div>
+                <button class="sq-btn" id="sq-next-wrong">下一题</button>
+            </div>
+            <div class="sq-page" id="sq-similar">
+                <h3>🔍 举一反三（根据错题生成）</h3>
+                <div class="sq-question-box" id="sq-similar-box"></div>
+                <button class="sq-btn" id="sq-next-similar">下一题</button>
+            </div>
+        </div>
+
+        <div class="footer-info">🧪 原电池学习中心 | 真题特训 · 仿真实验 · 希沃白板 · AI助教 · 智能题库 | 解析细致入微</div>
     </div>
-    <div class="footer-info">🧪 原电池学习中心 | 真题特训 · 仿真实验 · 希沃白板 · AI助教 | 解析细致入微</div>
-</div>
-<div id="toastMsg" class="toast-msg"></div>
+    <div id="toastMsg" class="toast-msg"></div>
 
-<script>
-    // ----------------------------- 完整真题库（合并所有题目，共30道）+ 极致详细解析 -----------------------------
-    // 以下整合了原10道核心题 + 历年资料库其他精选真题，每个选择题均配备合理选项及深度解析
-    const masterQuestions = [
-        { type:"选择题", text:"（2023·全国乙卷）可充电电池（LiCoO₂/石墨）放电总反应：LiCoO₂ + C₆ → Li₁₋ₓCoO₂ + LiₓC₆。下列说法正确的是（　）", options:["A. 放电时，LiCoO₂为正极","B. 放电时，电子由LiCoO₂电极经外电路流向石墨电极","C. 充电时，石墨电极发生氧化反应","D. 充电时，阴极反应为 Li⁺ + e⁻ → Li"], answer:"D", isSubjective:false, explanation:"⚡细致解析：放电时LiCoO₂中Co得电子，为正极材料，但表述A虽正确但本题针对充电选项判断：充电时阴极发生还原反应生成Li，D正确。电子流向：放电时电子从负极（石墨）流向正极(LiCoO₂)，B错；充电时石墨电极得电子为阴极发生还原反应，C错。正确答案D，此为锂离子电池核心考点。" },
-        { type:"选择题", text:"（2024·新高考Ⅰ卷）锌-空气燃料电池放电总反应：2Zn + O₂ + 4OH⁻ → 2Zn(OH)₄²⁻。下列说法错误的是（　）", options:["A. 放电时，负极反应为 Zn + 4OH⁻ - 2e⁻ → Zn(OH)₄²⁻","B. 放电时，OH⁻向负极移动","C. 充电时，每生成1 mol O₂，转移4 mol电子","D. 充电时，正极与电源负极相连"], answer:"D", isSubjective:false, explanation:"🔍深度解析：锌-空气电池负极Zn失电子生成Zn(OH)₄²⁻，A正确；阴离子移向负极，B正确；充电时正极发生氧化反应生成O₂，每生成1 mol O₂转移4 mol电子，C正确；充电时正极应与电源正极相连，故D错误。本题易错点在于充放电对应关系。" },
-        { type:"选择题", text:"（2023·新高考Ⅱ卷）Fe-Cu原电池盐桥含KCl，叙述正确的是（　）", options:["A. 外电路电子由铜片流向铁片","B. 铁片上发生还原反应","C. 盐桥中Cl⁻移向FeSO₄溶液","D. 正极反应式为 Cu²⁺ + 2e⁻ → Cu"], answer:"D", isSubjective:false, explanation:"🧪深度剖析：铁比铜活泼，铁为负极失电子，电子由铁流向铜，A错误；铁片上发生氧化反应，B错误；盐桥中阴离子Cl⁻向负极区（FeSO₄溶液）移动，而不是移向正极区？实际Cl⁻移向负极维持电荷平衡，但选项写法有陷阱，正确表述是Cl⁻移向负极区，C错误；若电解质含Cu²⁺，正极Cu²⁺得电子生成Cu，D正确。综合选D。" },
-        { type:"选择题", text:"（2022·全国甲卷）Zn、Cu、稀H₂SO₄原电池，说法不正确的是（　）", options:["A. Zn为负极，发生氧化反应","B. 正极反应为 2H⁺ + 2e⁻ → H₂↑","C. 电子由Zn经导线流向Cu","D. 电池工作时，Cu电极质量不断增加"], answer:"D", isSubjective:false, explanation:"📌解析：Zn活泼为负极失电子氧化反应，A对；正极H⁺得电子生成H₂，B对；电子由Zn经导线流向Cu，C对；Cu电极不参与反应，表面产生H₂质量不变，故D错误。考查基础，强调质量不变。" },
-        { type:"选择题", text:"（2024·全国甲卷）微生物电池中，下列说法错误的是（　）", options:["A. 正极反应中有CO₂生成","B. 微生物促进了反应中电子的转移","C. 质子通过交换膜从负极区移向正极区","D. 电池总反应为 C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O"], answer:"A", isSubjective:false, explanation:"🌱微生物燃料电池：负极葡萄糖氧化生成CO₂，正极氧气得电子生成水，所以正极反应无CO₂产生，A错误；微生物作催化剂加速电子转移，B正确；质子从负极移向正极，C正确；总反应为葡萄糖燃烧，D正确。" },
-        { type:"选择题", text:"（2023·浙江1月）银锌纽扣电池总反应 Zn + Ag₂O + H₂O → Zn(OH)₂ + 2Ag，正确的是（　）", options:["A. Ag₂O为正极，发生还原反应","B. Zn极发生还原反应","C. 电子由Zn极经外电路流向Ag₂O极","D. 电解质溶液中OH⁻向正极移动"], answer:"C", isSubjective:false, explanation:"🔋解析：Ag₂O中Ag得电子，为正极发生还原反应，A对？但选择题选唯一正确：C电子由负极Zn流向正极Ag₂O，正确；D中OH⁻应向负极移动。注意本题问法，C最符合电化学原理，选C。实际上A也正确，但单选C更核心说明电子流向。" },
-        { type:"选择题", text:"（2022·新高考Ⅰ卷）碱性硼化钒-空气电池，正确的是（　）", options:["A. 放电时负极发生还原反应","B. 电池工作时，OH⁻向正极移动","C. 正极反应式为 O₂+4e⁻+2H₂O→4OH⁻","D. VB₂极反应为 ... 省略"], answer:"C", isSubjective:false, explanation:"🌬️空气电池：负极失电子氧化反应，A错误；OH⁻向负极移动，B错误；碱性条件下正极氧气得电子生成OH⁻，C正确；VB₂极为负极失去电子，D不完整，C为正确答案。" },
-        { type:"选择题", text:"（2024·广东高考）Zn-Cu-稀H₂SO₄原电池示意图，正确的是（　）", options:["A. 铜片为负极","B. 电子由锌片经稀硫酸流向铜片","C. 溶液中H⁺向锌片移动","D. 总反应为 Zn+2H⁺→Zn²⁺+H₂↑"], answer:"D", isSubjective:false, explanation:"✨基础题：锌为负极铜为正极，A错；电子不经过电解质，经导线，B错；H⁺向正极（铜片）移动得电子，C错；总反应正确，D正确。" },
-        { type:"非选择题", text:"（2023·全国丙卷改编）Zn-Cu-稀H₂SO₄原电池实验填空", subPrompts:["（1）负极材料____，电极反应式____，反应类型____。","（2）正极反应式____，现象____。","（3）电子流向____，SO₄²⁻向____极移动。","（4）0.2 mol电子转移生成H₂体积（标况）____L。"], answer:"（1）Zn；Zn-2e⁻→Zn²⁺；氧化；（2）2H⁺+2e⁻→H₂↑；铜片表面有气泡；（3）由Zn极经外电路流向Cu极；Zn；（4）2.24", isSubjective:true, explanation:"🧪细致解析：负极Zn失电子溶解；正极H⁺得电子生成H₂气泡；电子从Zn流向Cu，阴离子SO₄²⁻移向负极Zn区；每生成1 mol H₂转移2 mol e⁻，0.2 mol e⁻生成0.1 mol H₂即2.24 L。强化氧化还原和电子转移计算。" },
-        { type:"非选择题", text:"（2024·江苏高考改编）甲烷燃料电池(KOH溶液)回答", subPrompts:["（1）CH₄通入____极，电极反应式____。","（2）O₂参与____极，电极反应式____。","（3）K⁺移向____极，负极区pH____。","（4）总反应离子方程式____，标况11.2L CH₄转移电子____mol。"], answer:"（1）负；CH₄+10OH⁻-8e⁻→CO₃²⁻+7H₂O；（2）正；O₂+4e⁻+2H₂O→4OH⁻；（3）正；减小；（4）CH₄+2O₂+2OH⁻→CO₃²⁻+3H₂O；4", isSubjective:true, explanation:"🔥燃料电池深度解：CH₄在负极失电子，碱性环境下生成CO₃²⁻；正极氧气得电子生成OH⁻；阳离子K⁺移向正极；负极消耗OH⁻导致pH减小；总反应合并得离子方程式；每1 mol CH₄转移8 mol e⁻，11.2 L为0.5 mol转移4 mol电子。逐空精讲。" },
-        // ---------------- 以下为历年真题扩充（极致精细） ----------------
-        { type:"选择题", text:"（2021·全国甲卷）下列有关原电池的说法正确的是（　）", options:["A. 原电池中正极发生氧化反应","B. 原电池工作时，电子从负极经电解质溶液流向正极","C. 原电池中负极材料一定参与反应","D. 原电池可以将化学能转化为电能"], answer:"D", isSubjective:false, explanation:"💡基本概念：正极发生还原反应，A错；电子不经过电解质，B错；负极不一定参与反应（如燃料电池），C错；原电池本质是化学能转化为电能，D正确。" },
-        { type:"选择题", text:"（2020·山东卷）微生物燃料电池处理废水，下列说法错误的是（　）", options:["A. 微生物在负极区发生氧化反应","B. 阳离子交换膜中阳离子向正极移动","C. 正极反应通常为O₂+4e⁻+4H⁺→2H₂O","D. 负极区pH升高"], answer:"D", isSubjective:false, explanation:"⚙️微生物电池：负极有机物被氧化产生H⁺，负极区pH降低，D错误；阳离子向正极移动保持电荷平衡正确；酸性条件正极反应为C正确；A正确。故选D。" },
-        { type:"选择题", text:"（2019·全国卷Ⅰ）锂离子电池放电时正极反应式为（　）: LiCoO₂ + xe⁻ → Li₁₋ₓCoO₂ + xLi⁺，下列分析正确的是", options:["A. Co元素化合价降低被还原","B. 石墨电极发生氧化反应","C. 电池充电时，锂离子向负极移动","D. 正极材料LiCoO₂中Co为+2价"], answer:"A", isSubjective:false, explanation:"🔋解析：放电时正极得电子Co从+3价降低，被还原，A正确；石墨为负极失电子氧化，但题干问正极反应，充电时锂离子向负极移动，但放电时向正极移动，排除法选A。" },
-        { type:"选择题", text:"（2018·北京卷）原电池Zn-Cu-稀硫酸，盐桥的作用是（　）", options:["A. 提供电子转移的通道","B. 隔离两极溶液，防止直接反应","C. 通过离子迁移维持电荷平衡","D. 参与电极反应生成沉淀"], answer:"C", isSubjective:false, explanation:"🧂盐桥核心功能：通过阴、阳离子的定向迁移构成闭合回路，维持溶液电中性，C全面准确。封闭电路而非电子通道。" },
-        { type:"选择题", text:"（2017·全国丙卷）铝-空气电池以NaCl溶液为电解质，负极反应式正确的是（　）", options:["A. Al - 3e⁻ → Al³⁺","B. Al + 4OH⁻ - 3e⁻ → Al(OH)₄⁻","C. O₂ + 2H₂O + 4e⁻ → 4OH⁻","D. Al³⁺+3e⁻ → Al"], answer:"B", isSubjective:false, explanation:"🌊铝空气电池中性条件实际发生Al与OH⁻配合，NaCl溶液中由于Al表面氧化膜和溶解氧，负极写为Al+4OH⁻-3e⁻→Al(OH)₄⁻最合理，B对；A在强酸条件适用；C为正极反应。" },
-        { type:"选择题", text:"（2016·四川卷）某原电池总反应为2Fe³⁺+Cu→2Fe²⁺+Cu²⁺，负极材料为（　）", options:["A. Fe","B. Cu","C. Pt","D. C"], answer:"B", isSubjective:false, explanation:"🧲解析：Cu失电子变为Cu²⁺，发生氧化反应，为负极，故负极材料应为Cu（活泼性较弱但作为还原剂）。答案B。" },
-        { type:"非选择题", text:"（2021·河北卷）锌锰干电池的结构与原理，写出正极反应。", subPrompts:["正极反应：____"], answer:"2MnO₂+2NH₄⁺+2e⁻→Mn₂O₃+2NH₃+H₂O", isSubjective:true, explanation:"🔋干电池正极为MnO₂得电子，在NH₄Cl电解质中生成Mn₂O₃和NH₃，方程式需记忆，本解析强调电子得失与介质条件。" },
-        { type:"选择题", text:"（2022·湖南卷）铁-空气电池，负极反应为Fe+2OH⁻-2e⁻→Fe(OH)₂，正极反应为（　）", options:["A. Fe(OH)₂+2e⁻→Fe+2OH⁻","B. 4OH⁻-4e⁻→2H₂O+O₂","C. O₂+2H₂O+4e⁻→4OH⁻","D. 2H₂O+2e⁻→H₂+2OH⁻"], answer:"C", isSubjective:false, explanation:"🌬️空气电池正极氧气得电子，碱性介质中生成OH⁻，反应为O₂+2H₂O+4e⁻→4OH⁻，选C。" },
-        { type:"选择题", text:"（2023·辽宁卷）Mg-AgCl海水电池，下列说法错误的是（　）", options:["A. 镁为负极发生氧化反应","B. 正极反应为Ag⁺+e⁻→Ag","C. 电池工作时Cl⁻向负极移动","D. 该电池可用于水下设备"], answer:"B", isSubjective:false, explanation:"🌊海水电池正极AgCl得电子生成Ag和Cl⁻：AgCl+e⁻→Ag+Cl⁻，故B错误（不是简单Ag⁺）；A、C、D均正确。" },
-        { type:"非选择题", text:"（2024·湖北卷）铅蓄电池放电时正极反应及充电时阴极反应填空。", subPrompts:["放电正极反应：____","充电阴极反应：____"], answer:"放电正极：PbO₂+4H⁺+SO₄²⁻+2e⁻→PbSO₄+2H₂O；充电阴极：PbSO₄+2e⁻→Pb+SO₄²⁻", isSubjective:true, explanation:"⚡铅蓄电池深度剖析：放电时正极PbO₂得电子生成PbSO₄；充电时阴极(PbSO₄)得电子还原成Pb，电极反应可逆，解析细致指导记忆。" },
-        { type:"选择题", text:"（2020·天津卷）氢氧燃料电池在酸性介质中正极反应式为（　）", options:["A. 2H₂-4e⁻→4H⁺","B. O₂+4H⁺+4e⁻→2H₂O","C. O₂+2H₂O+4e⁻→4OH⁻","D. 2H₂O+2e⁻→H₂+2OH⁻"], answer:"B", isSubjective:false, explanation:"⚡酸性介质中正极氧气得电子与H⁺结合生成水，正确为B；A为负极反应，C为碱性介质。" },
-        { type:"选择题", text:"（2025·八省联考）光驱动原电池装置，电子转移方向为（　）", options:["A. 从负极经外电路流向正极","B. 从正极经外电路流向负极","C. 在电解质中从负极移向正极","D. 在电解质中从正极移向负极"], answer:"A", isSubjective:false, explanation:"☀️光电池或光驱动原电池电子依然沿外电路由负极流向正极，A正确。" },
-        { type:"选择题", text:"（2019·海南卷）关于原电池的叙述正确的是（　）", options:["A. 原电池中电子流出的一极是正极","B. 原电池工作时，阳离子移向负极","C. 原电池中负极发生还原反应","D. 原电池可以将化学能直接转化为电能"], answer:"D", isSubjective:false, explanation:"💡电子流出极为负极，A错误；阳离子移向正极，B错误；负极发生氧化反应，C错误。D为原电池定义正确。" },
-        { type:"非选择题", text:"（2017·天津卷）Fe-Cu浓硝酸原电池特殊现象，写出两极反应。", subPrompts:["负极反应：____","正极反应：____"], answer:"负极：Fe钝化，实际Cu失电子：Cu-2e⁻→Cu²⁺；正极：NO₃⁻+4H⁺+3e⁻→NO↑+2H₂O", isSubjective:true, explanation:"⚠️特殊性：铁在浓硝酸中钝化，铜作负极失去电子，正极硝酸根还原生成NO，突破常规思维，细致解析钝化原理。" }
-    ];
-    // 确保总数30道左右
-    console.log("总题数:", masterQuestions.length);
+    <script>
+        (function() {
+            // ==================== 高考真题Flashcard模块 ====================
+            const masterQuestions = [
+                { type:"选择题", text:"（2023·全国乙卷）可充电电池（LiCoO₂/石墨）放电总反应：LiCoO₂ + C₆ → Li₁₋ₓCoO₂ + LiₓC₆。下列说法正确的是（　）", options:["A. 放电时，LiCoO₂为正极","B. 放电时，电子由LiCoO₂电极经外电路流向石墨电极","C. 充电时，石墨电极发生氧化反应","D. 充电时，阴极反应为 Li⁺ + e⁻ → Li"], answer:"D", isSubjective:false, explanation:"⚡细致解析：放电时LiCoO₂中Co得电子，为正极材料，但表述A虽正确但本题针对充电选项判断：充电时阴极发生还原反应生成Li，D正确。电子流向：放电时电子从负极（石墨）流向正极(LiCoO₂)，B错；充电时石墨电极得电子为阴极发生还原反应，C错。正确答案D。" },
+                { type:"选择题", text:"（2024·新高考Ⅰ卷）锌-空气燃料电池放电总反应：2Zn + O₂ + 4OH⁻ → 2Zn(OH)₄²⁻。下列说法错误的是（　）", options:["A. 放电时，负极反应为 Zn + 4OH⁻ - 2e⁻ → Zn(OH)₄²⁻","B. 放电时，OH⁻向负极移动","C. 充电时，每生成1 mol O₂，转移4 mol电子","D. 充电时，正极与电源负极相连"], answer:"D", isSubjective:false, explanation:"🔍深度解析：锌-空气电池负极Zn失电子生成Zn(OH)₄²⁻，A正确；阴离子移向负极，B正确；充电时正极发生氧化反应生成O₂，每生成1 mol O₂转移4 mol电子，C正确；充电时正极应与电源正极相连，故D错误。" },
+                { type:"选择题", text:"（2023·新高考Ⅱ卷）Fe-Cu原电池盐桥含KCl，叙述正确的是（　）", options:["A. 外电路电子由铜片流向铁片","B. 铁片上发生还原反应","C. 盐桥中Cl⁻移向FeSO₄溶液","D. 正极反应式为 Cu²⁺ + 2e⁻ → Cu"], answer:"D", isSubjective:false, explanation:"🧪深度剖析：铁比铜活泼，铁为负极失电子，电子由铁流向铜，A错误；铁片上发生氧化反应，B错误；盐桥中阴离子Cl⁻向负极区移动维持电荷平衡，C错误；若电解质含Cu²⁺，正极Cu²⁺得电子生成Cu，D正确。" },
+                { type:"选择题", text:"（2022·全国甲卷）Zn、Cu、稀H₂SO₄原电池，说法不正确的是（　）", options:["A. Zn为负极，发生氧化反应","B. 正极反应为 2H⁺ + 2e⁻ → H₂↑","C. 电子由Zn经导线流向Cu","D. 电池工作时，Cu电极质量不断增加"], answer:"D", isSubjective:false, explanation:"📌解析：Zn活泼为负极失电子氧化反应，A对；正极H⁺得电子生成H₂，B对；电子由Zn经导线流向Cu，C对；Cu电极不参与反应，表面产生H₂质量不变，故D错误。" },
+                { type:"选择题", text:"（2024·全国甲卷）微生物电池中，下列说法错误的是（　）", options:["A. 正极反应中有CO₂生成","B. 微生物促进了反应中电子的转移","C. 质子通过交换膜从负极区移向正极区","D. 电池总反应为 C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O"], answer:"A", isSubjective:false, explanation:"🌱微生物燃料电池：负极葡萄糖氧化生成CO₂，正极氧气得电子生成水，所以正极反应无CO₂产生，A错误。" },
+                { type:"选择题", text:"（2023·浙江1月）银锌纽扣电池总反应 Zn + Ag₂O + H₂O → Zn(OH)₂ + 2Ag，正确的是（　）", options:["A. Ag₂O为正极，发生还原反应","B. Zn极发生还原反应","C. 电子由Zn极经外电路流向Ag₂O极","D. 电解质溶液中OH⁻向正极移动"], answer:"C", isSubjective:false, explanation:"🔋解析：电子由负极Zn流向正极Ag₂O，C正确；Ag₂O为正极发生还原反应A也对但单选C更核心说明电子流向。" },
+                { type:"选择题", text:"（2022·新高考Ⅰ卷）碱性硼化钒-空气电池，正确的是（　）", options:["A. 放电时负极发生还原反应","B. 电池工作时，OH⁻向正极移动","C. 正极反应式为 O₂+4e⁻+2H₂O→4OH⁻","D. VB₂极反应为……"], answer:"C", isSubjective:false, explanation:"🌬️空气电池：负极失电子氧化反应，A错误；OH⁻向负极移动，B错误；碱性条件下正极氧气得电子生成OH⁻，C正确。" },
+                { type:"选择题", text:"（2024·广东高考）Zn-Cu-稀H₂SO₄原电池示意图，正确的是（　）", options:["A. 铜片为负极","B. 电子由锌片经稀硫酸流向铜片","C. 溶液中H⁺向锌片移动","D. 总反应为 Zn+2H⁺→Zn²⁺+H₂↑"], answer:"D", isSubjective:false, explanation:"✨基础题：锌为负极铜为正极，A错；电子不经过电解质，B错；H⁺向正极移动，C错；总反应正确，D正确。" },
+                { type:"非选择题", text:"（2023·全国丙卷改编）Zn-Cu-稀H₂SO₄原电池实验填空", subPrompts:["（1）负极材料____，电极反应式____，反应类型____。","（2）正极反应式____，现象____。","（3）电子流向____，SO₄²⁻向____极移动。","（4）0.2 mol电子转移生成H₂体积（标况）____L。"], answer:"（1）Zn；Zn-2e⁻→Zn²⁺；氧化；（2）2H⁺+2e⁻→H₂↑；铜片表面有气泡；（3）由Zn极经外电路流向Cu极；Zn；（4）2.24", isSubjective:true, explanation:"🧪细致解析：负极Zn失电子溶解；正极H⁺得电子生成H₂气泡；电子从Zn流向Cu，阴离子SO₄²⁻移向负极Zn区；每生成1 mol H₂转移2 mol e⁻，0.2 mol e⁻生成0.1 mol H₂即2.24 L。" },
+                { type:"非选择题", text:"（2024·江苏高考改编）甲烷燃料电池(KOH溶液)回答", subPrompts:["（1）CH₄通入____极，电极反应式____。","（2）O₂参与____极，电极反应式____。","（3）K⁺移向____极，负极区pH____。","（4）总反应离子方程式____，标况11.2L CH₄转移电子____mol。"], answer:"（1）负；CH₄+10OH⁻-8e⁻→CO₃²⁻+7H₂O；（2）正；O₂+4e⁻+2H₂O→4OH⁻；（3）正；减小；（4）CH₄+2O₂+2OH⁻→CO₃²⁻+3H₂O；4", isSubjective:true, explanation:"🔥燃料电池深度解：CH₄在负极失电子，碱性环境下生成CO₃²⁻；正极氧气得电子生成OH⁻；阳离子K⁺移向正极；负极消耗OH⁻导致pH减小；每1 mol CH₄转移8 mol e⁻，11.2 L为0.5 mol转移4 mol电子。" },
+                { type:"选择题", text:"（2021·全国甲卷）下列有关原电池的说法正确的是（　）", options:["A. 原电池中正极发生氧化反应","B. 原电池工作时，电子从负极经电解质溶液流向正极","C. 原电池中负极材料一定参与反应","D. 原电池可以将化学能转化为电能"], answer:"D", isSubjective:false, explanation:"💡基本概念：正极发生还原反应，A错；电子不经过电解质，B错；负极不一定参与反应（如燃料电池），C错；原电池本质是化学能转化为电能，D正确。" },
+                { type:"选择题", text:"（2020·山东卷）微生物燃料电池处理废水，下列说法错误的是（　）", options:["A. 微生物在负极区发生氧化反应","B. 阳离子交换膜中阳离子向正极移动","C. 正极反应通常为O₂+4e⁻+4H⁺→2H₂O","D. 负极区pH升高"], answer:"D", isSubjective:false, explanation:"⚙️微生物电池：负极有机物被氧化产生H⁺，负极区pH降低，D错误；阳离子向正极移动保持电荷平衡正确。" },
+                { type:"选择题", text:"（2019·全国卷Ⅰ）锂离子电池放电时正极反应式为（　）: LiCoO₂ + xe⁻ → Li₁₋ₓCoO₂ + xLi⁺，下列分析正确的是", options:["A. Co元素化合价降低被还原","B. 石墨电极发生氧化反应","C. 电池充电时，锂离子向负极移动","D. 正极材料LiCoO₂中Co为+2价"], answer:"A", isSubjective:false, explanation:"🔋解析：放电时正极得电子Co从+3价降低，被还原，A正确。" },
+                { type:"选择题", text:"（2018·北京卷）原电池Zn-Cu-稀硫酸，盐桥的作用是（　）", options:["A. 提供电子转移的通道","B. 隔离两极溶液，防止直接反应","C. 通过离子迁移维持电荷平衡","D. 参与电极反应生成沉淀"], answer:"C", isSubjective:false, explanation:"🧂盐桥核心功能：通过阴、阳离子的定向迁移构成闭合回路，维持溶液电中性，C全面准确。" },
+                { type:"选择题", text:"（2017·全国丙卷）铝-空气电池以NaCl溶液为电解质，负极反应式正确的是（　）", options:["A. Al - 3e⁻ → Al³⁺","B. Al + 4OH⁻ - 3e⁻ → Al(OH)₄⁻","C. O₂ + 2H₂O + 4e⁻ → 4OH⁻","D. Al³⁺+3e⁻ → Al"], answer:"B", isSubjective:false, explanation:"🌊铝空气电池中性条件实际发生Al与OH⁻配合，NaCl溶液中负极写为Al+4OH⁻-3e⁻→Al(OH)₄⁻最合理，B对。" },
+                { type:"选择题", text:"（2016·四川卷）某原电池总反应为2Fe³⁺+Cu→2Fe²⁺+Cu²⁺，负极材料为（　）", options:["A. Fe","B. Cu","C. Pt","D. C"], answer:"B", isSubjective:false, explanation:"🧲解析：Cu失电子变为Cu²⁺，发生氧化反应，为负极，故负极材料应为Cu。答案B。" },
+                { type:"非选择题", text:"（2021·河北卷）锌锰干电池的结构与原理，写出正极反应。", subPrompts:["正极反应：____"], answer:"2MnO₂+2NH₄⁺+2e⁻→Mn₂O₃+2NH₃+H₂O", isSubjective:true, explanation:"🔋干电池正极为MnO₂得电子，在NH₄Cl电解质中生成Mn₂O₃和NH₃。" },
+                { type:"选择题", text:"（2022·湖南卷）铁-空气电池，负极反应为Fe+2OH⁻-2e⁻→Fe(OH)₂，正极反应为（　）", options:["A. Fe(OH)₂+2e⁻→Fe+2OH⁻","B. 4OH⁻-4e⁻→2H₂O+O₂","C. O₂+2H₂O+4e⁻→4OH⁻","D. 2H₂O+2e⁻→H₂+2OH⁻"], answer:"C", isSubjective:false, explanation:"🌬️空气电池正极氧气得电子，碱性介质中生成OH⁻，反应为O₂+2H₂O+4e⁻→4OH⁻，选C。" },
+                { type:"选择题", text:"（2023·辽宁卷）Mg-AgCl海水电池，下列说法错误的是（　）", options:["A. 镁为负极发生氧化反应","B. 正极反应为Ag⁺+e⁻→Ag","C. 电池工作时Cl⁻向负极移动","D. 该电池可用于水下设备"], answer:"B", isSubjective:false, explanation:"🌊海水电池正极AgCl得电子生成Ag和Cl⁻：AgCl+e⁻→Ag+Cl⁻，故B错误（不是简单Ag⁺）。" },
+                { type:"非选择题", text:"（2024·湖北卷）铅蓄电池放电时正极反应及充电时阴极反应填空。", subPrompts:["放电正极反应：____","充电阴极反应：____"], answer:"放电正极：PbO₂+4H⁺+SO₄²⁻+2e⁻→PbSO₄+2H₂O；充电阴极：PbSO₄+2e⁻→Pb+SO₄²⁻", isSubjective:true, explanation:"⚡铅蓄电池深度剖析：放电时正极PbO₂得电子生成PbSO₄；充电时阴极(PbSO₄)得电子还原成Pb。" },
+                { type:"选择题", text:"（2020·天津卷）氢氧燃料电池在酸性介质中正极反应式为（　）", options:["A. 2H₂-4e⁻→4H⁺","B. O₂+4H⁺+4e⁻→2H₂O","C. O₂+2H₂O+4e⁻→4OH⁻","D. 2H₂O+2e⁻→H₂+2OH⁻"], answer:"B", isSubjective:false, explanation:"⚡酸性介质中正极氧气得电子与H⁺结合生成水，正确为B；A为负极反应，C为碱性介质。" },
+                { type:"选择题", text:"（2025·八省联考）光驱动原电池装置，电子转移方向为（　）", options:["A. 从负极经外电路流向正极","B. 从正极经外电路流向负极","C. 在电解质中从负极移向正极","D. 在电解质中从正极移向负极"], answer:"A", isSubjective:false, explanation:"☀️光电池或光驱动原电池电子依然沿外电路由负极流向正极，A正确。" },
+                { type:"选择题", text:"（2019·海南卷）关于原电池的叙述正确的是（　）", options:["A. 原电池中电子流出的一极是正极","B. 原电池工作时，阳离子移向负极","C. 原电池中负极发生还原反应","D. 原电池可以将化学能直接转化为电能"], answer:"D", isSubjective:false, explanation:"💡电子流出极为负极，A错误；阳离子移向正极，B错误；负极发生氧化反应，C错误。D为原电池定义正确。" },
+                { type:"非选择题", text:"（2017·天津卷）Fe-Cu浓硝酸原电池特殊现象，写出两极反应。", subPrompts:["负极反应：____","正极反应：____"], answer:"负极：Fe钝化，实际Cu失电子：Cu-2e⁻→Cu²⁺；正极：NO₃⁻+4H⁺+3e⁻→NO↑+2H₂O", isSubjective:true, explanation:"⚠️特殊性：铁在浓硝酸中钝化，铜作负极失去电子，正极硝酸根还原生成NO，突破常规思维。" }
+            ];
 
-    // 高考特训模块实现
-    let currentIndex = 0;
-    let answerVisible = false;
-    const containerDiv = document.createElement('div');
-    containerDiv.className = 'flashcard-container';
-    containerDiv.innerHTML = `
-        <div class="quiz-header"><span class="badge">🔋 原电池 · 高考真题特训（30道精编）</span><span class="progress" id="progressIndicator">第1/${masterQuestions.length}题</span></div>
-        <div class="question-card">
-            <div class="question-body">
-                <div class="q-title" id="questionType"></div>
-                <div class="question-text" id="questionText"></div>
-                <div id="optionsArea"></div>
-                <div id="subjectiveExtra" style="display:none;"></div>
-            </div>
-            <div class="action-buttons">
-                <button class="btn-prev" id="prevBtn">◀ 上一题</button>
-                <button class="btn-outline" id="toggleAnswerBtn">📖 显示答案与解析</button>
-                <button class="btn-primary" id="nextBtn">下一题 ▶</button>
-            </div>
-            <div class="answer-section" id="answerSection">
-                <div class="answer-title">📌 超详细解析 · 举一反三</div>
-                <div class="answer-detail" id="answerContent"></div>
-            </div>
-        </div>`;
-    document.getElementById('quizRoot').appendChild(containerDiv);
-    const qTypeEl = document.getElementById('questionType'), qTextEl = document.getElementById('questionText'), optsArea = document.getElementById('optionsArea');
-    const subExtra = document.getElementById('subjectiveExtra'), toggleBtn = document.getElementById('toggleAnswerBtn');
-    const next = document.getElementById('nextBtn'), prev = document.getElementById('prevBtn');
-    const ansSection = document.getElementById('answerSection'), ansContent = document.getElementById('answerContent'), progSpan = document.getElementById('progressIndicator');
+            let fcIndex = 0;
+            let fcAnswerVisible = false;
+            const quizRoot = document.getElementById('quizRoot');
+            const fcContainer = document.createElement('div');
+            fcContainer.className = 'flashcard-container';
+            fcContainer.innerHTML = `
+                <div class="quiz-header"><span class="b2adge">🔋 原电池 · 高考真题特训（${masterQuestions.length}道精编）</span><span class="progress" id="fcProgress">第1/${masterQuestions.length}题</span></div>
+                <div class="question-card">
+                    <div class="question-body">
+                        <div class="q-title" id="fcQType"></div>
+                        <div class="question-text" id="fcQText"></div>
+                        <div id="fcOptionsArea"></div>
+                        <div id="fcSubExtra" style="display:none;"></div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn-prev2" id="fcPrevBtn">◀ 上一题</button>
+                        <button class="btn-outline2" id="fcToggleBtn">📖 显示答案与解析</button>
+                        <button class="btn-primary2" id="fcNextBtn">下一题 ▶</button>
+                    </div>
+                    <div class="answer-section" id="fcAnswerSection">
+                        <div class="answer-title">📌 超详细解析 · 举一反三</div>
+                        <div class="answer-detail" id="fcAnswerContent"></div>
+                    </div>
+                </div>`;
+            quizRoot.appendChild(fcContainer);
 
-    function renderCurr() {
-        const q = masterQuestions[currentIndex];
-        qTypeEl.textContent = q.type === "选择题" ? "✅ 选择题" : "📝 非选择题/填空题";
-        qTextEl.textContent = q.text;
-        if (!q.isSubjective) {
-            optsArea.style.display = "block";
-            subExtra.style.display = "none";
-            optsArea.innerHTML = q.options.map(opt => `<div class="option-item"><span class="option-prefix">${opt[0]}.</span><span>${opt.substring(2)}</span></div>`).join('');
-        } else {
-            optsArea.style.display = "none";
-            subExtra.style.display = "block";
-            const promptsHtml = q.subPrompts ? q.subPrompts.map((p,i)=>`${i+1}. ${p}`).join('<br>') : q.text;
-            subExtra.innerHTML = `<div class="subjective-prompt">${promptsHtml}</div><div style="font-size:0.7rem;">💡 点击下方显示答案与详细解析</div>`;
-        }
-        progSpan.innerText = `第 ${currentIndex+1}/${masterQuestions.length} 题`;
-        let ansHtml = q.isSubjective 
-            ? `<strong>📝 参考答案：</strong><br>${q.answer.replace(/\n/g, '<br>')}<br><br><strong>🔍 深度解析：</strong><br>${q.explanation}`
-            : `<strong>✅ 正确答案：${q.answer}</strong><br><br>📖 详尽剖析：${q.explanation}<br><br>🎯 考点点拨：电子转移方向、电极判断、介质影响。`;
-        ansContent.innerHTML = ansHtml;
-        ansSection.style.display = answerVisible ? 'block' : 'none';
-        toggleBtn.textContent = answerVisible ? "🙈 隐藏解析" : "📖 显示答案与解析";
-    }
-    toggleBtn.onclick = () => { answerVisible = !answerVisible; ansSection.style.display = answerVisible ? 'block' : 'none'; toggleBtn.textContent = answerVisible ? "🙈 隐藏解析" : "📖 显示答案与解析"; };
-    next.onclick = () => { if(currentIndex+1 < masterQuestions.length) { currentIndex++; answerVisible=false; renderCurr(); window.scrollTo({top: document.getElementById('quizRoot').offsetTop-20, behavior:'smooth'}); } else { if(confirm("已完成全部30道真题！是否回到第一题重新特训？")){ currentIndex=0; answerVisible=false; renderCurr(); } } };
-    prev.onclick = () => { if(currentIndex>0) { currentIndex--; answerVisible=false; renderCurr(); window.scrollTo({top: document.getElementById('quizRoot').offsetTop-20, behavior:'smooth'}); } else { showToast("已是第一题"); } };
-    renderCurr();
+            const fcQTypeEl = document.getElementById('fcQType');
+            const fcQTextEl = document.getElementById('fcQText');
+            const fcOptsArea = document.getElementById('fcOptionsArea');
+            const fcSubExtra = document.getElementById('fcSubExtra');
+            const fcToggleBtn = document.getElementById('fcToggleBtn');
+            const fcNextBtn = document.getElementById('fcNextBtn');
+            const fcPrevBtn = document.getElementById('fcPrevBtn');
+            const fcAnsSection = document.getElementById('fcAnswerSection');
+            const fcAnsContent = document.getElementById('fcAnswerContent');
+            const fcProgSpan = document.getElementById('fcProgress');
 
-    // AI助手 (增强知识库)
-    const aiSend = document.getElementById('assistantSendBtn'), aiInput = document.getElementById('assistantInput'), chatBody = document.getElementById('assistantChatBody');
-    function aiFindAnswer(q) {
-        const lower = q.toLowerCase();
-        if(lower.includes('电子') && lower.includes('流向')) return "电子从负极（较活泼金属）经外电路流向正极（较不活泼金属或导电体），电流方向与之相反。";
-        if(lower.includes('盐桥')) return "盐桥的作用是：①形成闭合回路；②维持电荷平衡，阴离子移向负极区，阳离子移向正极区，避免液接电势。";
-        if(lower.includes('燃料电池')) return "燃料电池中燃料在负极失电子，氧化剂在正极得电子，通常需要特定催化剂，能量转化效率高。";
-        if(lower.includes('电极反应')) return "负极发生氧化反应（失电子），正极发生还原反应（得电子）。书写需注意介质（酸/碱）影响产物。";
-        return "原电池核心原理：自发的氧化还原反应通过外电路产生电流。常见考点：电极判断、电子/离子移动方向、电极反应式书写、盐桥作用。请提供更具体的问题。";
-    }
-    function addMsg(txt, type) { let m=document.createElement('div'); m.className=`assistant-message ${type}`; m.textContent=txt; chatBody.appendChild(m); chatBody.scrollTop=chatBody.scrollHeight; }
-    aiSend.onclick = () => { let q=aiInput.value.trim(); if(!q) return; addMsg(q,'user'); aiInput.value=''; addMsg('🤔 思考中...','assistant'); setTimeout(()=>{ let last=chatBody.querySelector('.assistant-message.assistant:last-child'); if(last) last.remove(); addMsg(aiFindAnswer(q),'assistant'); },150); };
-    aiInput.addEventListener('keydown', e=>{ if(e.key=='Enter') aiSend.click(); });
-    
-    // 希沃全屏及加载
-    document.getElementById('seewoFullscreenBtn')?.addEventListener('click',()=>{ window.open('https://13.r302.cc/lw8BK3D?platform=enpc&channel=copylink','_blank'); showToast('打开希沃白板'); });
-    function showToast(msg) { let t=document.getElementById('toastMsg'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2000); }
-    window.showToast = showToast;
-    // 处理iframe占位
-    const iframeSe = document.getElementById('seewoIframe');
-    if(iframeSe) iframeSe.addEventListener('load',()=> showToast("希沃课件加载成功"));
-</script>
+            function fcRender() {
+                const q = masterQuestions[fcIndex];
+                fcQTypeEl.textContent = q.type === "选择题" ? "✅ 选择题" : "📝 非选择题/填空题";
+                fcQTextEl.textContent = q.text;
+                if (!q.isSubjective) {
+                    fcOptsArea.style.display = "block";
+                    fcSubExtra.style.display = "none";
+                    fcOptsArea.innerHTML = q.options.map(opt => `<div class="option-itm"><span class="option-prefix">${opt[0]}.</span><span>${opt.substring(2)}</span></div>`).join('');
+                } else {
+                    fcOptsArea.style.display = "none";
+                    fcSubExtra.style.display = "block";
+                    const promptsHtml = q.subPrompts ? q.subPrompts.map((p, i) => `${i+1}. ${p}`).join('<br>') : q.text;
+                    fcSubExtra.innerHTML = `<div class="subjective-prompt">${promptsHtml}</div><div style="font-size:0.7rem;">💡 点击下方显示答案与详细解析</div>`;
+                }
+                fcProgSpan.textContent = `第 ${fcIndex+1}/${masterQuestions.length} 题`;
+                let ansHtml = q.isSubjective ?
+                    `<strong>📝 参考答案：</strong><br>${q.answer.replace(/\n/g, '<br>')}<br><br><strong>🔍 深度解析：</strong><br>${q.explanation}` :
+                    `<strong>✅ 正确答案：${q.answer}</strong><br><br>📖 详尽剖析：${q.explanation}`;
+                fcAnsContent.innerHTML = ansHtml;
+                fcAnsSection.style.display = fcAnswerVisible ? 'block' : 'none';
+                fcToggleBtn.textContent = fcAnswerVisible ? "🙈 隐藏解析" : "📖 显示答案与解析";
+            }
+            fcToggleBtn.onclick = () => { fcAnswerVisible = !fcAnswerVisible;
+                fcAnsSection.style.display = fcAnswerVisible ? 'block' : 'none';
+                fcToggleBtn.textContent = fcAnswerVisible ? "🙈 隐藏解析" : "📖 显示答案与解析"; };
+            fcNextBtn.onclick = () => {
+                if (fcIndex + 1 < masterQuestions.length) { fcIndex++;
+                    fcAnswerVisible = false;
+                    fcRender();
+                    window.scrollTo({ top: quizRoot.offsetTop - 20, behavior: 'smooth' }); } else { if (confirm(
+                        "已完成全部题目！是否回到第一题？")) { fcIndex = 0;
+                        fcAnswerVisible = false;
+                        fcRender(); } }
+            };
+            fcPrevBtn.onclick = () => { if (fcIndex > 0) { fcIndex--;
+                    fcAnswerVisible = false;
+                    fcRender();
+                    window.scrollTo({ top: quizRoot.offsetTop - 20, behavior: 'smooth' }); } else showToast("已是第一题"); };
+            fcRender();
+
+            // ==================== AI助手 ====================
+            const aiSend = document.getElementById('assistantSendBtn'),
+                aiInput = document.getElementById('assistantInput'),
+                chatBody = document.getElementById('assistantChatBody');
+
+            function aiFindAnswer(q) {
+                const lower = q.toLowerCase();
+                if (lower.includes('电子') && lower.includes('流向')) return "电子从负极（较活泼金属）经外电路流向正极（较不活泼金属或导电体），电流方向与之相反。";
+                if (lower.includes('盐桥')) return "盐桥的作用是：①形成闭合回路；②维持电荷平衡，阴离子移向负极区，阳离子移向正极区，避免液接电势。";
+                if (lower.includes('燃料电池')) return "燃料电池中燃料在负极失电子，氧化剂在正极得电子，通常需要特定催化剂，能量转化效率高。";
+                if (lower.includes('电极反应')) return "负极发生氧化反应（失电子），正极发生还原反应（得电子）。书写需注意介质（酸/碱）影响产物。";
+                return "原电池核心原理：自发的氧化还原反应通过外电路产生电流。常见考点：电极判断、电子/离子移动方向、电极反应式书写、盐桥作用。请提供更具体的问题。";
+            }
+
+            function addMsg(txt, type) { let m = document.createElement('div');
+                m.className = `assistant-message ${type}`;
+                m.textContent = txt;
+                chatBody.appendChild(m);
+                chatBody.scrollTop = chatBody.scrollHeight; }
+            aiSend.onclick = () => { let q = aiInput.value.trim(); if (!q) return;
+                addMsg(q, 'user');
+                aiInput.value = '';
+                addMsg('🤔 思考中...', 'assistant');
+                setTimeout(() => { let last = chatBody.querySelector('.assistant-message.assistant:last-child'); if (last) last
+                        .remove();
+                    addMsg(aiFindAnswer(q), 'assistant'); }, 150); };
+            aiInput.addEventListener('keydown', e => { if (e.key == 'Enter') aiSend.click(); });
+
+            // ==================== 希沃 ====================
+            document.getElementById('seewoFullscreenBtn')?.addEventListener('click', () => { window.open(
+                    'https://13.r302.cc/lw8BK3D?platform=enpc&channel=copylink', '_blank');
+                showToast('打开希沃白板'); });
+            const iframeSe = document.getElementById('seewoIframe');
+            if (iframeSe) iframeSe.addEventListener('load', () => showToast("希沃课件加载成功"));
+
+            // ==================== Toast ====================
+            function showToast(msg) { let t = document.getElementById('toastMsg');
+                t.textContent = msg;
+                t.classList.add('show');
+                setTimeout(() => t.classList.remove('show'), 2000); }
+            window.showToast = showToast;
+        })();
+
+        // ==================== 30题智能题库模块（独立IIFE） ====================
+        (function() {
+            const questionBank = [
+                { id: 1, type: "choice", title: "下列关于原电池的说法正确的是（）", options: ["A. 原电池是将电能转化为化学能",
+                        "B. 原电池负极发生氧化反应", "C. 原电池正极失去电子", "D. 原电池必须有两种活泼性相同的金属"
+                    ], answer: "B", analyze: "原电池化学能→电能；负极失电子氧化，正极得电子还原。" },
+                { id: 2, type: "choice", title: "铜锌原电池（稀硫酸）中，电子流向为（）", options: ["A. Zn→导线→Cu",
+                        "B. Cu→导线→Zn", "C. Zn→溶液→Cu", "D. Cu→溶液→Zn"
+                    ], answer: "A", analyze: "电子只在导线移动，负极Zn流出。" },
+                { id: 3, type: "judge", title: "原电池的负极一定是活泼金属", options: ["正确", "错误"], answer: "错误",
+                    analyze: "石墨、铂等也可作负极。" },
+                { id: 4, type: "choice", title: "下列装置能构成原电池的是（）", options: ["A. 铜片、锌片、乙醇", "B. 铜片、石墨、稀盐酸",
+                        "C. 锌片、锌片、稀硫酸", "D. 铜片、石墨、蔗糖溶液"
+                    ], answer: "B", analyze: "必须有电解质、两电极、闭合回路。" },
+                { id: 5, type: "judge", title: "在原电池中，阳离子向正极移动", options: ["正确", "错误"], answer: "正确",
+                    analyze: "阳离子向正极，阴离子向负极。" },
+                { id: 6, type: "choice", title: "铁、铜、硫酸铜溶液组成原电池，负极反应为（）", options: ["A. Fe - 2e⁻ = Fe²⁺",
+                        "B. Cu - 2e⁻ = Cu²⁺", "C. 2H⁺ + 2e⁻ = H₂↑", "D. Cu²⁺ + 2e⁻ = Cu"
+                    ], answer: "A", analyze: "Fe更活泼，作负极失电子。" },
+                { id: 7, type: "choice", title: "原电池工作时，下列说法正确的是（）", options: ["A. 正极带正电", "B. 负极发生还原反应",
+                        "C. 电子从正极经外电路流向负极", "D. 溶液中离子定向移动形成闭合回路"
+                    ], answer: "D", analyze: "离子移动+电子移动共同构成回路。" },
+                { id: 8, type: "judge", title: "原电池中电子通过电解质溶液从负极流向正极", options: ["正确", "错误"], answer: "错误",
+                    analyze: "电子不进入溶液，溶液中是离子移动。" },
+                { id: 9, type: "choice", title: "下列反应不能设计成原电池的是（）", options: ["A. 铁与硫酸铜溶液反应", "B. 氢气与氧气反应",
+                        "C. 盐酸与氢氧化钠反应", "D. 铝与稀盐酸反应"
+                    ], answer: "C", analyze: "非氧化还原反应不能设计成原电池。" },
+                { id: 10, type: "choice", title: "锌铜原电池（稀硫酸）中，正极上的现象是（）", options: ["A. 锌片溶解", "B. 铜片上产生气泡",
+                        "C. 铜片溶解", "D. 溶液变蓝"
+                    ], answer: "B", analyze: "正极H+得电子生成氢气。" },
+                { id: 11, type: "judge", title: "原电池的正极一定是不活泼金属", options: ["正确", "错误"], answer: "错误",
+                    analyze: "正极可以是活泼金属，只要正极不参与反应。" },
+                { id: 12, type: "choice", title: "下列物质可作为原电池电解质溶液的是（）", options: ["A. 葡萄糖溶液", "B. 酒精", "C. 稀硫酸",
+                        "D. 植物油"
+                    ], answer: "C", analyze: "电解质必须能电离出自由移动离子。" },
+                { id: 13, type: "choice", title: "某原电池反应为Cu + 2Ag⁺ = Cu²⁺ + 2Ag，负极材料是（）", options: ["A. Ag",
+                        "B. Cu", "C. 石墨", "D. 铂"
+                    ], answer: "B", analyze: "失电子的金属作负极。" },
+                { id: 14, type: "judge", title: "原电池工作时，负极质量一定减少，正极质量一定增加", options: ["正确", "错误"], answer: "错误",
+                    analyze: "如氢氧燃料电池，两极质量都不变。" },
+                { id: 15, type: "choice", title: "原电池中，发生还原反应的是（）", options: ["A. 负极", "B. 正极", "C. 电解质", "D. 导线"],
+                    answer: "B", analyze: "正极得电子，发生还原反应。" },
+                { id: 16, type: "choice", title: "锌、银、稀硫酸组成原电池，负极是（）", options: ["A. 锌", "B. 银", "C. 稀硫酸", "D. 无法判断"],
+                    answer: "A", analyze: "活泼金属作负极。" },
+                { id: 17, type: "judge", title: "构成原电池必须有两个金属电极", options: ["正确", "错误"], answer: "错误",
+                    analyze: "可以一金属一石墨，或两惰性电极。" },
+                { id: 18, type: "choice", title: "铜、铁、浓硝酸组成原电池，负极是（）", options: ["A. 铜", "B. 铁", "C. 石墨", "D. 无法判断"],
+                    answer: "A", analyze: "铁遇浓硝酸钝化，铜能持续反应，所以铜作负极。" },
+                { id: 19, type: "choice", title: "原电池的能量转化效率比燃烧直接发电（）", options: ["A. 更高", "B. 更低", "C. 相等",
+                        "D. 无法比较"
+                    ], answer: "A", analyze: "原电池无热能损耗，能量转化率高。" },
+                { id: 20, type: "judge", title: "在锌铜原电池中，盐桥的作用是保持溶液电中性", options: ["正确", "错误"], answer: "正确",
+                    analyze: "盐桥传递离子，维持电荷平衡。" },
+                { id: 21, type: "choice", title: "下列关于原电池正负极描述错误的是（）", options: ["A. 负极流出电子", "B. 正极发生氧化",
+                        "C. 负极被氧化", "D. 阳离子移向正极"
+                    ], answer: "B", analyze: "正极发生还原反应。" },
+                { id: 22, type: "choice", title: "Mg、Al、NaOH溶液组成原电池，负极是（）", options: ["A. Mg", "B. Al", "C. 都可以",
+                        "D. 无法判断"
+                    ], answer: "B", analyze: "Al能与NaOH反应，Mg不能，所以Al作负极。" },
+                { id: 23, type: "judge", title: "原电池工作时，外电路电子流动，内电路离子流动", options: ["正确", "错误"], answer: "正确",
+                    analyze: "电子走导线，离子走溶液。" },
+                { id: 24, type: "choice", title: "下列关于原电池应用错误的是（）", options: ["A. 制作电池", "B. 加快反应速率", "C. 防止金属腐蚀",
+                        "D. 所有化学反应都可制成原电池"
+                    ], answer: "D", analyze: "只有自发氧化还原反应才能制成原电池。" },
+                { id: 25, type: "choice", title: "锌锰干电池属于（）", options: ["A. 一次电池", "B. 二次电池", "C. 燃料电池", "D. 太阳能电池"],
+                    answer: "A", analyze: "锌锰干电池不可充电，是一次电池。" },
+                { id: 26, type: "judge", title: "燃料电池的燃料在负极发生氧化反应", options: ["正确", "错误"], answer: "正确",
+                    analyze: "燃料失电子，在负极氧化。" },
+                { id: 27, type: "choice", title: "铅蓄电池充电时，能量转化为（）", options: ["A. 化学能→电能", "B. 电能→化学能", "C. 化学能→热能",
+                        "D. 电能→热能"
+                    ], answer: "B", analyze: "充电是电解过程，电能转化学能。" },
+                { id: 28, type: "choice", title: "下列电池最环保的是（）", options: ["A. 锌锰电池", "B. 镍镉电池", "C. 氢氧燃料电池",
+                    "D. 铅蓄电池"], answer: "C", analyze: "氢氧燃料电池产物是水，无污染。" },
+                { id: 29, type: "judge", title: "外加电流阴极保护法利用了原电池原理", options: ["正确", "错误"], answer: "错误",
+                    analyze: "这是电解池原理，牺牲阳极法才是原电池原理。" },
+                { id: 30, type: "choice", title: "牺牲阳极法保护钢闸门，应连接的金属是（）", options: ["A. 铜", "B. 铅", "C. 锌", "D. 铁"],
+                    answer: "C", analyze: "连接比铁活泼的金属，锌作负极被腐蚀。" }
+            ];
+
+            const similarBank = [
+                { id: "s1", title: "原电池能量转化形式是（）", options: ["A. 电能→化学能", "B. 化学能→电能", "C. 热能→电能",
+                        "D. 化学能→热能"
+                    ], answer: "B", from: 1 },
+                { id: "s2", title: "原电池正极发生的反应是（）", options: ["A. 氧化反应", "B. 还原反应", "C. 置换反应", "D. 分解反应"],
+                    answer: "B", from: 1 },
+                { id: "s3", title: "铜锌原电池中，溶液中H+移向（）", options: ["A. 锌片", "B. 铜片", "C. 均匀移动", "D. 不移动"],
+                    answer: "B", from: 2 },
+                { id: "s4", title: "下列可作为原电池负极的是（）", options: ["A.石墨", "B.铂电极", "C.锌", "D.都可以"], answer: "D",
+                    from: 3 },
+                { id: "s5", title: "下列物质可做原电池电解质的是（）", options: ["A.蔗糖", "B.酒精", "C.氯化钠溶液", "D.植物油"],
+                    answer: "C", from: 4 },
+                { id: "s6", title: "下列不能构成原电池的是（）", options: ["A.Fe、C、稀盐酸", "B.Cu、Ag、CuSO4", "C.Zn、Fe、乙醇",
+                        "D.Mg、Al、NaOH"
+                    ], answer: "C", from: 4 },
+                { id: "s7", title: "原电池中电子移动方向是（）", options: ["A.正极→外电路→负极", "B.负极→外电路→正极", "C.正极→溶液→负极",
+                        "D.负极→溶液→正极"
+                    ], answer: "B", from: 8 },
+                { id: "s8", title: "氢氧燃料电池的优点是（）", options: ["A.产物无污染", "B.储氢方便", "C.造价低", "D.无需催化剂"], answer: "A",
+                    from: 28 }
+            ];
+
+            const wrapper = document.getElementById('smartQuizWrapper');
+            let sqCurrentIndex = 0;
+            let sqWrongSet = new Set(JSON.parse(localStorage.getItem("wrongQs30v2") || "[]"));
+            let sqWrongList = [];
+            let sqSimilarList = [];
+            let sqCurrentSimilarIndex = 0;
+
+            function sqSaveWrong() {
+                localStorage.setItem("wrongQs30v2", JSON.stringify([...sqWrongSet]));
+            }
+
+            function sqRemoveWrong(id) { sqWrongSet.delete(id);
+                sqSaveWrong(); }
+
+            function sqAddWrong(id) { sqWrongSet.add(id);
+                sqSaveWrong(); }
+
+            // DOM元素
+            const sqTabs = wrapper.querySelectorAll('.sq-tab');
+            const sqPages = wrapper.querySelectorAll('.sq-page');
+            const sqPracticeBox = document.getElementById('sq-practice-box');
+            const sqWrongPracticeBox = document.getElementById('sq-wrong-practice-box');
+            const sqSimilarBox = document.getElementById('sq-similar-box');
+            const sqTotalQ = document.getElementById('sq-total-q');
+            const sqCurrentNum = document.getElementById('sq-current-num');
+            const sqWrongCount = document.getElementById('sq-wrong-count');
+            const sqWrongListEl = document.getElementById('sq-wrong-list');
+            sqTotalQ.textContent = questionBank.length;
+
+            // 标签切换
+            sqTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    sqTabs.forEach(t => t.classList.remove('sq-active'));
+                    tab.classList.add('sq-active');
+                    const target = tab.dataset.target;
+                    sqPages.forEach(p => p.classList.remove('sq-show'));
+                    const targetPage = document.getElementById(target);
+                    if (targetPage) targetPage.classList.add('sq-show');
+                    if (target === 'sq-wrongbook') sqRenderWrongList();
+                    if (target === 'sq-practice-wrong') sqLoadWrongPractice();
+                    if (target === 'sq-similar') sqLoadSimilar();
+                });
+            });
+
+            // 渲染题目
+            function sqRenderQuestion(box, q, callback) {
+                let html = `<div class="sq-q-title">${q.title}</div><div class="sq-options">`;
+                q.options.forEach((opt) => {
+                    html +=
+                        `<div class="sq-option" data-ans="${opt}">${opt}</div>`;
+                });
+                html += `</div><div class="sq-result"></div>`;
+                box.innerHTML = html;
+                const opts = box.querySelectorAll('.sq-option');
+                const res = box.querySelector('.sq-result');
+                let selected = null;
+                opts.forEach(o => {
+                    o.onclick = () => {
+                        opts.forEach(x => x.classList.remove('sq-selected'));
+                        o.classList.add('sq-selected');
+                        selected = o.dataset.ans;
+                    };
+                });
+                // 找到对应的下一题按钮
+                const nextBtn = box.parentElement.querySelector('.sq-btn');
+                if (nextBtn) {
+                    const newBtn = nextBtn.cloneNode(true);
+                    nextBtn.parentNode.replaceChild(newBtn, nextBtn);
+                    newBtn.onclick = () => {
+                        if (!selected) return showToast("请选择答案！");
+                        const isRight = selected === q.answer;
+                        if (isRight) {
+                            res.textContent = "✅ 回答正确！";
+                            res.className = "sq-result sq-correct";
+                            sqRemoveWrong(q.id);
+                        } else {
+                            res.textContent = `❌ 错误，正确答案：${q.answer}。解析：${q.analyze || "无"}`;
+                            res.className = "sq-result sq-wrong";
+                            sqAddWrong(q.id);
+                        }
+                        if (callback) setTimeout(callback, 1200);
+                    };
+                }
+            }
+
+            function sqLoadPractice() {
+                if (sqCurrentIndex >= questionBank.length) sqCurrentIndex = 0;
+                const q = questionBank[sqCurrentIndex];
+                sqCurrentNum.textContent = sqCurrentIndex + 1;
+                sqRenderQuestion(sqPracticeBox, q, () => {
+                    sqCurrentIndex++;
+                    sqLoadPractice();
+                });
+            }
+
+            function sqLoadWrongPractice() {
+                sqWrongList = questionBank.filter(q => sqWrongSet.has(q.id));
+                sqWrongCount.textContent = sqWrongList.length;
+                if (sqWrongList.length === 0) {
+                    sqWrongPracticeBox.innerHTML = `<div class="sq-empty-tip">暂无错题，太棒了！</div>`;
+                    return;
+                }
+                sqRenderQuestion(sqWrongPracticeBox, sqWrongList[0], () => {
+                    sqLoadWrongPractice();
+                });
+            }
+
+            function sqRenderWrongList() {
+                const list = questionBank.filter(q => sqWrongSet.has(q.id));
+                if (list.length === 0) {
+                    sqWrongListEl.innerHTML = `<div class="sq-empty-tip">错题本为空</div>`;
+                    return;
+                }
+                sqWrongListEl.innerHTML = list.map(q => `
+                    <div class="sq-wrong-item">
+                        <div style="font-weight:600;">${q.title}</div>
+                        <div style="color:#dc2626;margin-top:4px;">答案：${q.answer} | ${q.analyze || ''}</div>
+                    </div>
+                `).join("");
+            }
+
+            function sqLoadSimilar() {
+                const wrongIds = [...sqWrongSet];
+                sqSimilarList = similarBank.filter(s => wrongIds.includes(s.from));
+                if (sqSimilarList.length === 0) sqSimilarList = similarBank;
+                sqCurrentSimilarIndex = 0;
+                sqRenderSimilar();
+            }
+
+            function sqRenderSimilar() {
+                if (sqCurrentSimilarIndex >= sqSimilarList.length) sqCurrentSimilarIndex = 0;
+                const q = sqSimilarList[sqCurrentSimilarIndex];
+                sqRenderQuestion(sqSimilarBox, q, () => {
+                    sqCurrentSimilarIndex++;
+                    sqRenderSimilar();
+                });
+            }
+
+            // 清空错题
+            document.getElementById('sq-clear-wrong').onclick = () => {
+                if (!confirm('确定清空所有错题？')) return;
+                sqWrongSet.clear();
+                sqSaveWrong();
+                sqRenderWrongList();
+            };
+
+            // 初始化
+            sqLoadPractice();
+            console.log('📚 30题智能题库模块已就绪');
+        })();
+    </script>
 </body>
 </html>
